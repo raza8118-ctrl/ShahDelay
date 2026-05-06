@@ -3,1141 +3,493 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Naat Studio — Live Vocal Processor</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Naat Studio Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0805;
-  --s1:#100e08;
-  --s2:#181410;
-  --s3:#201c16;
-  --border:#3a3020;
-  --border2:#524535;
-  --gold:#c9952a;
-  --gold2:#e8b84b;
-  --gold3:#f5d07a;
-  --goldl:rgba(201,149,42,0.15);
-  --text:#f0e8d5;
-  --text2:#9a8a6a;
-  --text3:#5a4a30;
-  --green:#4cdf7a;
-  --red:#ff4444;
-  --blue:#4ab8ff;
-  --teal:#2de8c8;
+  --bg:#07070a;--s1:#0d0d14;--s2:#13131e;--s3:#1a1a28;
+  --border:#252535;--border2:#363650;
+  --gold:#d4a017;--gold2:#f0c040;--gold3:#fff0a0;--goldl:rgba(212,160,23,0.12);
+  --text:#eae8ff;--text2:#8080aa;--text3:#404060;
+  --green:#00ff88;--red:#ff3355;--blue:#4488ff;--teal:#00ddcc;--purple:#cc88ff;
+  --echo:#ffcc00;
 }
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Rajdhani',sans-serif;
-  min-height:100vh;
-  background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(201,149,42,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 100%, rgba(201,149,42,0.04) 0%, transparent 60%);
-}
-
-/* GEOMETRIC PATTERN BG */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;opacity:0.03;
-  background-image:
-    linear-gradient(45deg,var(--gold) 1px,transparent 1px),
-    linear-gradient(-45deg,var(--gold) 1px,transparent 1px);
-  background-size:40px 40px;
-  z-index:0;
-}
-
-/* HEADER */
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(212,160,23,0.07),transparent)}
 header{
   position:sticky;top:0;z-index:100;
-  background:rgba(10,8,5,0.95);
-  backdrop-filter:blur(20px);
+  background:rgba(7,7,10,0.96);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  padding:0 24px;
-  display:flex;align-items:center;height:64px;gap:20px;
+  padding:0 20px;height:58px;display:flex;align-items:center;gap:14px;
 }
-.logo{
-  font-family:'Cinzel',serif;
-  font-size:20px;font-weight:700;
-  color:var(--gold2);
-  letter-spacing:4px;
-  text-shadow:0 0 30px rgba(232,184,75,0.4);
-  white-space:nowrap;
-}
-.logo span{color:var(--text2);font-weight:400;font-size:13px;display:block;letter-spacing:6px;margin-top:-4px}
-.divider{width:1px;height:30px;background:var(--border2);flex-shrink:0}
-.status-pill{
-  display:flex;align-items:center;gap:8px;
-  background:var(--s2);border:1px solid var(--border);
-  padding:6px 14px;border-radius:20px;
-}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all 0.3s;flex-shrink:0}
-.dot.live{background:var(--green);box-shadow:0 0 8px rgba(76,223,122,0.8);animation:blink 1.5s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.5}}
-.status-text{font-size:12px;color:var(--text2);letter-spacing:2px;font-weight:500}
-.lat-box{
-  font-size:11px;color:var(--text2);letter-spacing:1px;
-  background:var(--s2);border:1px solid var(--border);
-  padding:6px 14px;border-radius:4px;
-}
-.lat-box b{color:var(--teal);font-size:14px}
-.btn-main{
-  margin-left:auto;
-  padding:0 28px;height:40px;
-  border:1px solid var(--gold);
-  background:linear-gradient(135deg,rgba(201,149,42,0.2),rgba(201,149,42,0.05));
-  color:var(--gold2);
-  font-family:'Rajdhani',sans-serif;
-  font-size:14px;font-weight:600;letter-spacing:3px;
-  border-radius:4px;cursor:pointer;transition:all 0.2s;
-}
-.btn-main:hover{background:rgba(201,149,42,0.25);box-shadow:0 0 20px rgba(201,149,42,0.2)}
-.btn-main.live{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.1)}
-.btn-main.live:hover{background:rgba(255,68,68,0.2)}
-
-/* MAIN */
-main{position:relative;z-index:1;padding:24px;max-width:1300px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-
-/* WARN */
-.warn{
-  background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.3);
-  color:var(--red);padding:14px 20px;border-radius:6px;
-  font-size:14px;letter-spacing:1px;display:none;text-align:center;
-}
-
-/* SECTION TITLE */
-.sec-title{
-  font-family:'Cinzel',serif;font-size:10px;letter-spacing:6px;
-  color:var(--gold);opacity:0.7;margin-bottom:12px;display:flex;align-items:center;gap:12px;
-}
-.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
-
-/* PRESET ROW */
-.preset-row{display:flex;gap:10px;flex-wrap:wrap}
-.preset-card{
-  flex:1;min-width:130px;
-  padding:12px 16px;
-  border:1px solid var(--border);
-  background:var(--s1);
-  border-radius:6px;cursor:pointer;
-  transition:all 0.2s;text-align:center;
-}
-.preset-card:hover{border-color:var(--border2);background:var(--s2)}
-.preset-card.active{border-color:var(--gold);background:var(--goldl);box-shadow:0 0 20px rgba(201,149,42,0.15)}
-.preset-card .pname{font-family:'Cinzel',serif;font-size:12px;color:var(--gold2);letter-spacing:2px;font-weight:600}
-.preset-card .pdesc{font-size:11px;color:var(--text2);margin-top:3px;letter-spacing:0.5px}
-.preset-card.active .pname{text-shadow:0 0 10px rgba(232,184,75,0.5)}
-
-/* TOP ROW: VIZ + IO */
-.top-row{display:grid;grid-template-columns:1fr 320px;gap:20px}
-@media(max-width:800px){.top-row{grid-template-columns:1fr}}
-
-/* PANELS */
+.logo{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold2);letter-spacing:3px;white-space:nowrap}
+.logo small{display:block;font-size:9px;letter-spacing:5px;color:var(--text3);font-family:'Rajdhani',sans-serif;margin-top:-2px}
+.h-sep{width:1px;height:28px;background:var(--border2)}
+.h-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all .3s;flex-shrink:0}
+.dot.on{background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.h-txt{font-size:11px;letter-spacing:2px;color:var(--text2)}
+.h-lat{background:var(--s2);border:1px solid var(--border);padding:5px 12px;border-radius:4px;font-size:11px;color:var(--text2);letter-spacing:1px}
+.h-lat b{color:var(--teal);font-size:13px;font-weight:700}
+.h-btn{margin-left:auto;height:38px;padding:0 24px;border:1px solid var(--gold);background:rgba(212,160,23,0.1);color:var(--gold2);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;border-radius:4px;cursor:pointer;transition:all .2s}
+.h-btn:hover{background:rgba(212,160,23,0.2)}
+.h-btn.stop{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.1)}
+main{position:relative;z-index:1;padding:18px;max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.warn{background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.35);color:var(--red);padding:12px 18px;border-radius:6px;font-size:13px;letter-spacing:1px;display:none;text-align:center}
+.presets-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:900px){.presets-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.presets-grid{grid-template-columns:repeat(2,1fr)}}
+.pc{padding:12px 10px;border:1px solid var(--border);background:var(--s1);border-radius:6px;cursor:pointer;text-align:center;transition:all .2s}
+.pc:hover{border-color:var(--border2);background:var(--s2)}
+.pc.on{border-color:var(--gold);background:var(--goldl);box-shadow:0 0 20px rgba(212,160,23,0.15)}
+.pc .pn{font-family:'Cinzel',serif;font-size:11px;color:var(--gold2);letter-spacing:2px;font-weight:600}
+.pc .pd{font-size:10px;color:var(--text3);margin-top:3px}
+.pc.on .pn{color:var(--gold3);text-shadow:0 0 12px rgba(240,192,64,.5)}
+.grid-top{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:780px){.grid-top{grid-template-columns:1fr}}
+.grid-fx{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:960px){.grid-fx{grid-template-columns:1fr 1fr}}
+@media(max-width:580px){.grid-fx{grid-template-columns:1fr}}
 .panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.panel-head{
-  padding:12px 18px;background:var(--s2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.panel-title{font-size:11px;letter-spacing:3px;font-weight:600;color:var(--text2);text-transform:uppercase}
-.panel-body{padding:18px}
-
-/* GOLD BAR accent */
-.gold-bar{width:3px;height:16px;border-radius:2px;flex-shrink:0}
-
-/* VIZ CANVAS */
-#vizCanvas{width:100%;display:block;border-radius:4px}
-
-/* VU METERS */
-.vu-wrap{display:flex;gap:8px;align-items:flex-end;height:80px;padding:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px}
-.vu-bar-wrap{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
-.vu-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-align:center;margin-bottom:4px}
-.vu-bar{width:100%;border-radius:2px 2px 0 0;transition:height 0.05s;background:linear-gradient(to top,var(--green),#aaff44,#ffdd00,var(--red));min-height:2px}
-
-/* SLIDER CONTROL */
-.ctrl{display:flex;flex-direction:column;gap:6px}
-.ctrl-head{display:flex;justify-content:space-between;align-items:center}
-.ctrl-label{font-size:11px;color:var(--text2);letter-spacing:2px;font-weight:500}
-.ctrl-val{font-size:13px;color:var(--gold2);font-weight:600;min-width:60px;text-align:right}
-input[type=range]{
-  width:100%;height:3px;appearance:none;-webkit-appearance:none;
-  border-radius:2px;outline:none;cursor:pointer;
-  background:linear-gradient(90deg,var(--gold) var(--pct,50%),var(--s3) var(--pct,50%));
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:var(--gold2);border:2px solid var(--bg);
-  box-shadow:0 0 10px rgba(232,184,75,0.5);
-  transition:box-shadow 0.2s;
-}
-input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 16px rgba(232,184,75,0.8)}
-input[type=range].blue::-webkit-slider-thumb{background:var(--blue);box-shadow:0 0 10px rgba(74,184,255,0.5)}
-input[type=range].blue{background:linear-gradient(90deg,var(--blue) var(--pct,50%),var(--s3) var(--pct,50%))}
-input[type=range].teal::-webkit-slider-thumb{background:var(--teal);box-shadow:0 0 10px rgba(45,232,200,0.4)}
-input[type=range].teal{background:linear-gradient(90deg,var(--teal) var(--pct,50%),var(--s3) var(--pct,50%))}
-input[type=range].red::-webkit-slider-thumb{background:var(--red);box-shadow:0 0 10px rgba(255,68,68,0.4)}
-input[type=range].red{background:linear-gradient(90deg,var(--red) var(--pct,50%),var(--s3) var(--pct,50%))}
-
-/* EFFECTS GRID */
-.fx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:960px){.fx-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:580px){.fx-grid{grid-template-columns:1fr}}
-
-/* FX MODULE */
-.fx-mod{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.fx-head{
-  padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.fx-title{font-size:11px;letter-spacing:3px;font-weight:600;text-transform:uppercase}
-.fx-body{padding:16px;display:flex;flex-direction:column;gap:14px}
-
-/* ON/OFF TOGGLE */
-.toggle{margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
-.tog-track{
-  width:38px;height:20px;border-radius:10px;
-  background:var(--s3);border:1px solid var(--border);
-  position:relative;transition:all 0.25s;flex-shrink:0;
-}
-.tog-track.on{background:rgba(201,149,42,0.25);border-color:var(--gold)}
-.tog-thumb{
-  position:absolute;top:2px;left:2px;width:14px;height:14px;
-  border-radius:50%;background:var(--text3);transition:all 0.25s;
-}
-.tog-track.on .tog-thumb{left:20px;background:var(--gold2);box-shadow:0 0 8px rgba(232,184,75,0.6)}
-.tog-label{font-size:10px;color:var(--text3);letter-spacing:1px;transition:color 0.2s}
-.tog-track.on + .tog-label,
-.toggle:has(.on) .tog-label{color:var(--gold)}
-
-/* TAP TEMPO */
-.tap-row{display:flex;gap:8px;margin-top:4px}
-.tap-btn{
-  padding:8px 14px;background:transparent;border:1px solid var(--border2);
-  color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;
-  border-radius:4px;cursor:pointer;transition:all 0.15s;flex:1;
-}
-.tap-btn:hover{border-color:var(--gold);color:var(--gold)}
-.tap-btn:active{background:var(--goldl);transform:scale(0.97)}
-.tap-display{
-  flex:1;background:var(--s2);border:1px solid var(--border);
-  border-radius:4px;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:600;letter-spacing:2px;color:var(--gold2);
-}
-
-/* EQ curve */
-#eqCanvas{width:100%;border-radius:4px;display:block;background:var(--s2);border:1px solid var(--border)}
-
-/* IO PANEL */
-.io-panel{display:flex;flex-direction:column;gap:14px}
-
-/* BIG STATUS */
-.live-badge{
-  padding:10px;border-radius:6px;text-align:center;
-  background:rgba(76,223,122,0.1);border:1px solid rgba(76,223,122,0.3);
-  font-size:11px;letter-spacing:3px;color:var(--green);font-weight:600;
-  display:none;
-}
-.live-badge.show{display:block}
-
-/* NAAT highlight */
-.naat-glow{box-shadow:0 0 30px rgba(201,149,42,0.2),inset 0 0 30px rgba(201,149,42,0.03)}
-
-/* Reverb type buttons */
-.type-row{display:flex;gap:6px;flex-wrap:wrap}
-.type-btn{
-  padding:5px 12px;border:1px solid var(--border);background:transparent;
-  color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;
-  border-radius:3px;cursor:pointer;transition:all 0.15s;
-}
-.type-btn:hover{border-color:var(--border2);color:var(--text)}
-.type-btn.active{border-color:var(--gold);color:var(--gold2);background:var(--goldl)}
-
-/* Footer */
-footer{
-  text-align:center;padding:20px;font-size:11px;color:var(--text3);
-  letter-spacing:2px;position:relative;z-index:1;
-  border-top:1px solid var(--border);margin-top:8px;
-}
+.ph{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.ph-title{font-size:10px;letter-spacing:3px;font-weight:700;color:var(--text2);text-transform:uppercase}
+.pb{padding:16px}
+.ab{width:3px;border-radius:2px;height:14px;flex-shrink:0}
+.vu-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.vu-item label{font-size:9px;color:var(--text3);letter-spacing:2px;display:block;text-align:center;margin-bottom:5px}
+.vu-track{height:10px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.vu-fill{height:100%;width:0%;border-radius:3px;transition:width .06s}
+#vuInF{background:linear-gradient(90deg,var(--green) 0%,#aaff00 70%,var(--red) 100%)}
+#vuOutF{background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 70%,var(--red) 100%)}
+.sl{display:flex;flex-direction:column;gap:6px}
+.sl-top{display:flex;justify-content:space-between;align-items:baseline}
+.sl-label{font-size:10px;letter-spacing:2px;color:var(--text2);font-weight:600}
+.sl-val{font-size:13px;font-weight:700;min-width:55px;text-align:right}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;appearance:none;border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 8px currentColor;cursor:pointer}
+.sl-gold input{background:linear-gradient(90deg,var(--gold2) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-gold input::-webkit-slider-thumb{color:var(--gold2);background:var(--gold2)}
+.sl-gold .sl-val{color:var(--gold2)}
+.sl-blue input{background:linear-gradient(90deg,var(--blue) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-blue input::-webkit-slider-thumb{color:var(--blue);background:var(--blue)}
+.sl-blue .sl-val{color:var(--blue)}
+.sl-teal input{background:linear-gradient(90deg,var(--teal) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-teal input::-webkit-slider-thumb{color:var(--teal);background:var(--teal)}
+.sl-teal .sl-val{color:var(--teal)}
+.sl-purple input{background:linear-gradient(90deg,var(--purple) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-purple input::-webkit-slider-thumb{color:var(--purple);background:var(--purple)}
+.sl-purple .sl-val{color:var(--purple)}
+.sl-red input{background:linear-gradient(90deg,var(--red) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-red input::-webkit-slider-thumb{color:var(--red);background:var(--red)}
+.sl-red .sl-val{color:var(--red)}
+.sl-echo input{background:linear-gradient(90deg,var(--echo) var(--p,50%),var(--s3) var(--p,50%))}
+.sl-echo input::-webkit-slider-thumb{color:var(--echo);background:var(--echo)}
+.sl-echo .sl-val{color:var(--echo)}
+.tog-row{margin-left:auto;display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.tog-track{width:36px;height:18px;border-radius:9px;background:var(--s3);border:1px solid var(--border);position:relative;transition:all .25s}
+.tog-track.on{background:rgba(212,160,23,.2);border-color:var(--gold)}
+.tog-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text3);transition:all .25s}
+.tog-track.on .tog-thumb{left:20px;background:var(--gold2);box-shadow:0 0 8px rgba(240,192,64,.7)}
+.tog-lbl{font-size:9px;letter-spacing:1px;color:var(--text3)}
+.tog-track.on~.tog-lbl{color:var(--gold)}
+.echo-mod{background:var(--s1);border:2px solid rgba(255,204,0,.35);border-radius:8px;overflow:hidden;box-shadow:0 0 30px rgba(255,204,0,.08),inset 0 0 40px rgba(255,204,0,.03)}
+.echo-head{padding:12px 18px;background:rgba(255,204,0,.08);border-bottom:1px solid rgba(255,204,0,.2);display:flex;align-items:center;gap:10px}
+.echo-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.echo-badge{font-size:9px;padding:3px 10px;border-radius:3px;letter-spacing:2px;font-weight:700;background:rgba(255,204,0,.15);color:var(--echo);border:1px solid rgba(255,204,0,.3)}
+.fx{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.fx-h{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.fx-title{font-size:10px;letter-spacing:3px;font-weight:700;text-transform:uppercase}
+.fx-b{padding:16px;display:flex;flex-direction:column;gap:12px}
+.tap-row{display:flex;gap:8px}
+.tap-btn{flex:1;padding:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;border-radius:4px;cursor:pointer;transition:all .15s}
+.tap-btn:hover{border-color:var(--echo);color:var(--echo)}
+.tap-btn:active{transform:scale(.96);background:rgba(255,204,0,.08)}
+.tap-disp{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--echo)}
+#eqCvs{display:block;width:100%;border-radius:4px;background:var(--s2);border:1px solid var(--border)}
+.rev-types{display:flex;gap:6px;flex-wrap:wrap}
+.rt{padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;border-radius:3px;cursor:pointer;transition:all .15s}
+.rt:hover{border-color:var(--border2);color:var(--text)}
+.rt.on{border-color:var(--teal);color:var(--teal);background:rgba(0,221,204,.08)}
+.gr-wrap{height:5px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-top:2px}
+.gr-fill{height:100%;width:0%;background:var(--red);border-radius:3px;transition:width .08s}
+select{background:var(--s3);color:var(--text2);border:1px solid var(--border);padding:4px 10px;font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:1px;border-radius:3px;outline:none}
+footer{text-align:center;padding:16px;font-size:10px;color:var(--text3);letter-spacing:2px;border-top:1px solid var(--border);position:relative;z-index:1}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="logo">
-    نعت اسٹوڈیو
-    <span>NAAT STUDIO PRO</span>
-  </div>
-  <div class="divider"></div>
-  <div class="status-pill">
-    <div class="dot" id="dot"></div>
-    <div class="status-text" id="statusText">READY</div>
-  </div>
-  <div class="lat-box">LATENCY &nbsp;<b id="latVal">—</b> ms</div>
-  <div class="live-badge" id="liveBadge">⬤ LIVE</div>
-  <button class="btn-main" id="btnStart" onclick="toggle()">▶ &nbsp;START</button>
+  <div class="logo">نعت اسٹوڈیو <small>NAAT STUDIO PRO</small></div>
+  <div class="h-sep"></div>
+  <div class="h-pill"><div class="dot" id="dot"></div><div class="h-txt" id="hTxt">READY</div></div>
+  <div class="h-lat">LAT &nbsp;<b id="hLat">—</b> ms</div>
+  <button class="h-btn" id="btn" onclick="toggle()">&#9654; &nbsp;START</button>
 </header>
-
 <main>
-  <div class="warn" id="warn">⚠ Microphone access denied. Allow mic permissions and reload the page.</div>
-
-  <!-- PRESETS -->
-  <div>
-    <div class="sec-title">PRESETS</div>
-    <div class="preset-row">
-      <div class="preset-card active" onclick="applyPreset('naat',this)">
-        <div class="pname">NAAT MEHFIL</div>
-        <div class="pdesc">Classic Pakistani echo sound</div>
-      </div>
-      <div class="preset-card" onclick="applyPreset('grand',this)">
-        <div class="pname">GRAND HALL</div>
-        <div class="pdesc">Large reverb, deep echo</div>
-      </div>
-      <div class="preset-card" onclick="applyPreset('studio',this)">
-        <div class="pname">STUDIO</div>
-        <div class="pdesc">Pro vocal, tight sound</div>
-      </div>
-      <div class="preset-card" onclick="applyPreset('intimate',this)">
-        <div class="pname">INTIMATE</div>
-        <div class="pdesc">Small room, warm</div>
-      </div>
-      <div class="preset-card" onclick="applyPreset('mosque',this)">
-        <div class="pname">MOSQUE</div>
-        <div class="pdesc">Long reverb, sacred space</div>
-      </div>
-      <div class="preset-card" onclick="applyPreset('dry',this)">
-        <div class="pname">DRY MONITOR</div>
-        <div class="pdesc">Zero effects — pure voice</div>
-      </div>
-    </div>
+  <div class="warn" id="warn">&#9888; Microphone access denied — allow mic permissions and reload.</div>
+  <div class="presets-grid">
+    <div class="pc on" onclick="preset('naat',this)"><div class="pn">NAAT MEHFIL</div><div class="pd">Classic echo sound</div></div>
+    <div class="pc" onclick="preset('echo_only',this)"><div class="pn">ECHO ONLY</div><div class="pd">Pure echo, no reverb</div></div>
+    <div class="pc" onclick="preset('mosque',this)"><div class="pn">MOSQUE</div><div class="pd">Long sacred reverb</div></div>
+    <div class="pc" onclick="preset('grand',this)"><div class="pn">GRAND HALL</div><div class="pd">Big stage sound</div></div>
+    <div class="pc" onclick="preset('studio',this)"><div class="pn">STUDIO</div><div class="pd">Tight pro vocal</div></div>
+    <div class="pc" onclick="preset('dry',this)"><div class="pn">DRY MONITOR</div><div class="pd">Pure voice no FX</div></div>
   </div>
-
-  <!-- TOP ROW: VIZ + IO -->
-  <div class="top-row">
-
-    <!-- WAVEFORM + VU -->
+  <div class="grid-top">
     <div class="panel">
-      <div class="panel-head">
-        <div class="gold-bar" style="background:var(--gold)"></div>
-        <div class="panel-title">LIVE MONITOR</div>
-        <select id="vizMode" onchange="vizModeChange()" style="margin-left:auto;background:var(--s3);color:var(--text2);border:1px solid var(--border);padding:4px 10px;font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;border-radius:3px">
-          <option value="wave">WAVEFORM</option>
-          <option value="spec">SPECTRUM</option>
-        </select>
+      <div class="ph">
+        <div class="ab" style="background:var(--gold)"></div>
+        <div class="ph-title">LIVE MONITOR</div>
+        <select id="vizMode" style="margin-left:auto"><option value="wave">WAVEFORM</option><option value="spec">SPECTRUM</option></select>
       </div>
-      <div class="panel-body" style="padding:14px">
-        <canvas id="vizCanvas" height="110"></canvas>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-          <div>
-            <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;text-align:center">INPUT LEVEL</div>
-            <div style="height:12px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
-              <div id="vuIn" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--green),#aaff00,var(--red));transition:width 0.06s"></div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;text-align:center">OUTPUT LEVEL</div>
-            <div style="height:12px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
-              <div id="vuOut" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--red));transition:width 0.06s"></div>
-            </div>
-          </div>
+      <div class="pb" style="padding:12px">
+        <canvas id="vizCvs" height="100" style="width:100%;display:block;border-radius:4px"></canvas>
+        <div class="vu-row">
+          <div class="vu-item"><label>INPUT</label><div class="vu-track"><div class="vu-fill" id="vuInF"></div></div></div>
+          <div class="vu-item"><label>OUTPUT</label><div class="vu-track"><div class="vu-fill" id="vuOutF"></div></div></div>
         </div>
       </div>
     </div>
-
-    <!-- I/O CONTROL -->
     <div class="panel">
-      <div class="panel-head">
-        <div class="gold-bar" style="background:var(--teal)"></div>
-        <div class="panel-title">INPUT / OUTPUT</div>
-      </div>
-      <div class="panel-body">
-        <div class="io-panel">
-          <div class="ctrl">
-            <div class="ctrl-head">
-              <div class="ctrl-label">INPUT GAIN</div>
-              <div class="ctrl-val" id="vInGain">0.0 dB</div>
-            </div>
-            <input type="range" class="teal" id="inGain" min="-12" max="18" step="0.5" value="0" oninput="sliderUpdate(this,'inGain')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head">
-              <div class="ctrl-label">MASTER VOLUME</div>
-              <div class="ctrl-val" id="vOutVol">80%</div>
-            </div>
-            <input type="range" class="teal" id="outVol" min="0" max="100" step="1" value="80" oninput="sliderUpdate(this,'outVol')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head">
-              <div class="ctrl-label">DRY / WET</div>
-              <div class="ctrl-val" id="vDryWet">40%</div>
-            </div>
-            <input type="range" class="" id="dryWet" min="0" max="100" step="1" value="40" oninput="sliderUpdate(this,'dryWet')">
-          </div>
-          <div style="border-top:1px solid var(--border);padding-top:14px">
-            <div style="font-size:11px;color:var(--text3);letter-spacing:2px;margin-bottom:10px">QUICK CONTROLS</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="tap-btn" onclick="toggleBypass('echo')" id="qEcho" style="flex:1">ECHO ON</button>
-              <button class="tap-btn" onclick="toggleBypass('reverb')" id="qReverb" style="flex:1">REVERB ON</button>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-              <button class="tap-btn" onclick="toggleBypass('chorus')" id="qChorus" style="flex:1">CHORUS ON</button>
-              <button class="tap-btn" onclick="toggleBypass('eq')" id="qEQ" style="flex:1">EQ ON</button>
-            </div>
-          </div>
+      <div class="ph"><div class="ab" style="background:var(--teal)"></div><div class="ph-title">INPUT / OUTPUT</div></div>
+      <div class="pb" style="display:flex;flex-direction:column;gap:14px">
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">INPUT GAIN</div><div class="sl-val" id="d-inGain">0 dB</div></div><input type="range" id="inGain" min="-12" max="18" step=".5" value="0" oninput="upd(this)"></div>
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">MASTER VOLUME</div><div class="sl-val" id="d-outVol">85%</div></div><input type="range" id="outVol" min="0" max="100" step="1" value="85" oninput="upd(this)"></div>
+        <div class="sl sl-gold"><div class="sl-top"><div class="sl-label">DRY / WET MIX</div><div class="sl-val" id="d-dryWet">50%</div></div><input type="range" id="dryWet" min="0" max="100" step="1" value="50" oninput="upd(this)"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="tap-btn" style="padding:10px" onclick="byp('echo')" id="qe">ECHO ON</button>
+          <button class="tap-btn" style="padding:10px" onclick="byp('reverb')" id="qr">REVERB ON</button>
+          <button class="tap-btn" style="padding:10px" onclick="byp('chorus')" id="qc">CHORUS OFF</button>
+          <button class="tap-btn" style="padding:10px" onclick="byp('eq')" id="qq">EQ ON</button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- FX MODULES -->
-  <div>
-    <div class="sec-title">EFFECTS CHAIN</div>
-    <div class="fx-grid">
-
-      <!-- ECHO (DELAY) — PRIMARY FOR NAAT -->
-      <div class="fx-mod naat-glow">
-        <div class="fx-head" style="border-left:3px solid var(--gold)">
-          <div class="fx-title" style="color:var(--gold2)">ECHO / DELAY</div>
-          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(201,149,42,0.15);color:var(--gold);border:1px solid rgba(201,149,42,0.3);letter-spacing:1px">NAAT</span>
-          <div class="toggle" onclick="toggleBypass('echo')">
-            <div class="tog-track on" id="tog-echo"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
-        </div>
-        <div class="fx-body">
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">ECHO TIME</div><div class="ctrl-val" id="vEchoTime">340 ms</div></div>
-            <input type="range" id="echoTime" min="30" max="900" step="5" value="340" oninput="sliderUpdate(this,'echoTime')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">REPEATS</div><div class="ctrl-val" id="vEchoFb">55%</div></div>
-            <input type="range" id="echoFb" min="0" max="85" step="1" value="55" oninput="sliderUpdate(this,'echoFb')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">ECHO TONE</div><div class="ctrl-val" id="vEchoDamp">8 kHz</div></div>
-            <input type="range" id="echoDamp" min="1000" max="20000" step="200" value="8000" oninput="sliderUpdate(this,'echoDamp')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">ECHO VOLUME</div><div class="ctrl-val" id="vEchoWet">45%</div></div>
-            <input type="range" id="echoWet" min="0" max="100" step="1" value="45" oninput="sliderUpdate(this,'echoWet')">
-          </div>
-          <div class="tap-row">
-            <button class="tap-btn" onclick="doTap('echo')">TAP TEMPO</button>
-            <div class="tap-display" id="tapEcho">— BPM</div>
-          </div>
-        </div>
+  <div class="grid-fx">
+    <!-- ECHO HERO -->
+    <div class="echo-mod">
+      <div class="echo-head">
+        <div style="font-size:11px;letter-spacing:3px;font-weight:700;color:var(--echo)">&#9733; ECHO / DELAY</div>
+        <div class="echo-badge">NAAT SPECIAL</div>
+        <div class="tog-row" onclick="byp('echo')"><div class="tog-track on" id="t-echo"><div class="tog-thumb"></div></div><span class="tog-lbl">ON</span></div>
       </div>
-
-      <!-- PING PONG DELAY -->
-      <div class="fx-mod">
-        <div class="fx-head" style="border-left:3px solid var(--blue)">
-          <div class="fx-title" style="color:var(--blue)">PING-PONG</div>
-          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(74,184,255,0.1);color:var(--blue);border:1px solid rgba(74,184,255,0.3);letter-spacing:1px">STEREO</span>
-          <div class="toggle" onclick="toggleBypass('ping')">
-            <div class="tog-track on" id="tog-ping"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
+      <div class="echo-body">
+        <div style="text-align:center;padding:8px;background:rgba(255,204,0,.06);border:1px solid rgba(255,204,0,.15);border-radius:6px">
+          <div style="font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:4px">ECHO TIME</div>
+          <div style="font-size:36px;font-weight:700;color:var(--echo);letter-spacing:2px;line-height:1" id="echoTimeBig">340</div>
+          <div style="font-size:11px;color:var(--text2);letter-spacing:2px">milliseconds</div>
         </div>
-        <div class="fx-body">
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">DELAY TIME</div><div class="ctrl-val" id="vPingTime">480 ms</div></div>
-            <input type="range" class="blue" id="pingTime" min="30" max="800" step="5" value="480" oninput="sliderUpdate(this,'pingTime')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">FEEDBACK</div><div class="ctrl-val" id="vPingFb">45%</div></div>
-            <input type="range" class="blue" id="pingFb" min="0" max="85" step="1" value="45" oninput="sliderUpdate(this,'pingFb')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">STEREO WIDTH</div><div class="ctrl-val" id="vPingWidth">100%</div></div>
-            <input type="range" class="blue" id="pingWidth" min="0" max="100" step="1" value="100" oninput="sliderUpdate(this,'pingWidth')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vPingWet">25%</div></div>
-            <input type="range" class="blue" id="pingWet" min="0" max="100" step="1" value="25" oninput="sliderUpdate(this,'pingWet')">
-          </div>
-          <div class="tap-row">
-            <button class="tap-btn" onclick="doTap('ping')">TAP TEMPO</button>
-            <div class="tap-display" id="tapPing" style="color:var(--blue)">— BPM</div>
-          </div>
+        <div class="sl sl-echo"><div class="sl-top"><div class="sl-label">ECHO TIME</div><div class="sl-val" id="d-echoTime">340 ms</div></div><input type="range" id="echoTime" min="30" max="900" step="5" value="340" oninput="upd(this)"></div>
+        <div class="sl sl-echo"><div class="sl-top"><div class="sl-label">REPEATS (FEEDBACK)</div><div class="sl-val" id="d-echoFb">65%</div></div><input type="range" id="echoFb" min="0" max="88" step="1" value="65" oninput="upd(this)"></div>
+        <div class="sl sl-echo"><div class="sl-top"><div class="sl-label">ECHO BRIGHTNESS</div><div class="sl-val" id="d-echoDamp">16 kHz</div></div><input type="range" id="echoDamp" min="2000" max="20000" step="200" value="16000" oninput="upd(this)"></div>
+        <div class="sl sl-echo"><div class="sl-top"><div class="sl-label">ECHO VOLUME</div><div class="sl-val" id="d-echoWet">60%</div></div><input type="range" id="echoWet" min="0" max="100" step="1" value="60" oninput="upd(this)"></div>
+        <div class="tap-row">
+          <button class="tap-btn" onclick="doTap('echo')">TAP TEMPO</button>
+          <div class="tap-disp" id="tapEcho">— BPM</div>
         </div>
+        <div style="display:flex;gap:4px;align-items:flex-end;height:28px">
+          <div style="flex:1;background:var(--echo);border-radius:2px" id="ev0"></div>
+          <div style="flex:1;border-radius:2px;opacity:.65" id="ev1"></div>
+          <div style="flex:1;border-radius:2px;opacity:.45" id="ev2"></div>
+          <div style="flex:1;border-radius:2px;opacity:.28" id="ev3"></div>
+          <div style="flex:1;border-radius:2px;opacity:.15" id="ev4"></div>
+          <div style="flex:1;border-radius:2px;opacity:.08" id="ev5"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text3);letter-spacing:2px;text-align:center">ECHO DECAY VISUALIZATION</div>
       </div>
-
-      <!-- REVERB -->
-      <div class="fx-mod">
-        <div class="fx-head" style="border-left:3px solid var(--teal)">
-          <div class="fx-title" style="color:var(--teal)">REVERB</div>
-          <div class="toggle" onclick="toggleBypass('reverb')">
-            <div class="tog-track on" id="tog-reverb"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
-        </div>
-        <div class="fx-body">
-          <div class="type-row">
-            <button class="type-btn active" onclick="setRevType('room',this)">ROOM</button>
-            <button class="type-btn" onclick="setRevType('hall',this)">HALL</button>
-            <button class="type-btn" onclick="setRevType('plate',this)">PLATE</button>
-            <button class="type-btn" onclick="setRevType('mosque',this)">MOSQUE</button>
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">ROOM SIZE</div><div class="ctrl-val" id="vRevSize">60%</div></div>
-            <input type="range" class="teal" id="revSize" min="5" max="100" step="1" value="60" oninput="sliderUpdate(this,'revSize')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">DECAY</div><div class="ctrl-val" id="vRevDecay">2.5 s</div></div>
-            <input type="range" class="teal" id="revDecay" min="0.3" max="9" step="0.1" value="2.5" oninput="sliderUpdate(this,'revDecay')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">PRE-DELAY</div><div class="ctrl-val" id="vRevPre">15 ms</div></div>
-            <input type="range" class="teal" id="revPre" min="0" max="80" step="1" value="15" oninput="sliderUpdate(this,'revPre')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vRevWet">30%</div></div>
-            <input type="range" class="teal" id="revWet" min="0" max="100" step="1" value="30" oninput="sliderUpdate(this,'revWet')">
-          </div>
-        </div>
+    </div>
+    <!-- PING PONG -->
+    <div class="fx">
+      <div class="fx-h" style="border-left:3px solid var(--blue)"><div class="fx-title" style="color:var(--blue)">PING-PONG</div><span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(68,136,255,.1);color:var(--blue);border:1px solid rgba(68,136,255,.3);letter-spacing:1px">STEREO</span><div class="tog-row" onclick="byp('ping')"><div class="tog-track on" id="t-ping"><div class="tog-thumb"></div></div><span class="tog-lbl">ON</span></div></div>
+      <div class="fx-b">
+        <div class="sl sl-blue"><div class="sl-top"><div class="sl-label">TIME</div><div class="sl-val" id="d-pingTime">510 ms</div></div><input type="range" id="pingTime" min="30" max="800" step="5" value="510" oninput="upd(this)"></div>
+        <div class="sl sl-blue"><div class="sl-top"><div class="sl-label">FEEDBACK</div><div class="sl-val" id="d-pingFb">40%</div></div><input type="range" id="pingFb" min="0" max="85" step="1" value="40" oninput="upd(this)"></div>
+        <div class="sl sl-blue"><div class="sl-top"><div class="sl-label">STEREO WIDTH</div><div class="sl-val" id="d-pingWidth">100%</div></div><input type="range" id="pingWidth" min="0" max="100" step="1" value="100" oninput="upd(this)"></div>
+        <div class="sl sl-blue"><div class="sl-top"><div class="sl-label">WET MIX</div><div class="sl-val" id="d-pingWet">18%</div></div><input type="range" id="pingWet" min="0" max="100" step="1" value="18" oninput="upd(this)"></div>
+        <div class="tap-row"><button class="tap-btn" style="border-color:rgba(68,136,255,.3);color:var(--blue)" onclick="doTap('ping')">TAP TEMPO</button><div class="tap-disp" id="tapPing" style="color:var(--blue)">— BPM</div></div>
       </div>
-
-      <!-- EQ -->
-      <div class="fx-mod">
-        <div class="fx-head" style="border-left:3px solid #ff9f43">
-          <div class="fx-title" style="color:#ff9f43">3-BAND EQ</div>
-          <div class="toggle" onclick="toggleBypass('eq')">
-            <div class="tog-track on" id="tog-eq"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
+    </div>
+    <!-- REVERB -->
+    <div class="fx">
+      <div class="fx-h" style="border-left:3px solid var(--teal)"><div class="fx-title" style="color:var(--teal)">REVERB</div><div class="tog-row" onclick="byp('reverb')"><div class="tog-track on" id="t-reverb"><div class="tog-thumb"></div></div><span class="tog-lbl">ON</span></div></div>
+      <div class="fx-b">
+        <div class="rev-types">
+          <button class="rt on" onclick="revType('room',this)">ROOM</button>
+          <button class="rt" onclick="revType('hall',this)">HALL</button>
+          <button class="rt" onclick="revType('mosque',this)">MOSQUE</button>
+          <button class="rt" onclick="revType('plate',this)">PLATE</button>
         </div>
-        <div class="fx-body">
-          <canvas id="eqCanvas" height="70"></canvas>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">LOW GAIN</div><div class="ctrl-val" id="vEqLow">0 dB</div></div>
-            <input type="range" id="eqLow" min="-18" max="18" step="0.5" value="0" oninput="sliderUpdate(this,'eqLow')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">MID GAIN <span style="font-size:10px;color:var(--text3)">(1-4kHz)</span></div><div class="ctrl-val" id="vEqMid">+2 dB</div></div>
-            <input type="range" id="eqMid" min="-18" max="18" step="0.5" value="2" oninput="sliderUpdate(this,'eqMid')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">HIGH GAIN <span style="font-size:10px;color:var(--text3)">(AIR)</span></div><div class="ctrl-val" id="vEqHigh">+3 dB</div></div>
-            <input type="range" id="eqHigh" min="-18" max="18" step="0.5" value="3" oninput="sliderUpdate(this,'eqHigh')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">PRESENCE FREQ</div><div class="ctrl-val" id="vEqMidF">2.5 kHz</div></div>
-            <input type="range" id="eqMidF" min="500" max="8000" step="100" value="2500" oninput="sliderUpdate(this,'eqMidF')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-        </div>
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">ROOM SIZE</div><div class="sl-val" id="d-revSize">55%</div></div><input type="range" id="revSize" min="5" max="100" step="1" value="55" oninput="upd(this)"></div>
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">DECAY</div><div class="sl-val" id="d-revDecay">2.0 s</div></div><input type="range" id="revDecay" min=".2" max="9" step=".1" value="2" oninput="upd(this)"></div>
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">PRE-DELAY</div><div class="sl-val" id="d-revPre">12 ms</div></div><input type="range" id="revPre" min="0" max="80" step="1" value="12" oninput="upd(this)"></div>
+        <div class="sl sl-teal"><div class="sl-top"><div class="sl-label">WET MIX</div><div class="sl-val" id="d-revWet">22%</div></div><input type="range" id="revWet" min="0" max="100" step="1" value="22" oninput="upd(this)"></div>
       </div>
-
-      <!-- CHORUS -->
-      <div class="fx-mod">
-        <div class="fx-head" style="border-left:3px solid #c44dff">
-          <div class="fx-title" style="color:#c44dff">CHORUS</div>
-          <div class="toggle" onclick="toggleBypass('chorus')">
-            <div class="tog-track on" id="tog-chorus"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
-        </div>
-        <div class="fx-body">
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">RATE</div><div class="ctrl-val" id="vChorRate">0.8 Hz</div></div>
-            <input type="range" id="chorRate" min="0.1" max="8" step="0.1" value="0.8" oninput="sliderUpdate(this,'chorRate')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">DEPTH</div><div class="ctrl-val" id="vChorDepth">8 ms</div></div>
-            <input type="range" id="chorDepth" min="1" max="25" step="0.5" value="8" oninput="sliderUpdate(this,'chorDepth')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">SPREAD</div><div class="ctrl-val" id="vChorSpread">80%</div></div>
-            <input type="range" id="chorSpread" min="0" max="100" step="1" value="80" oninput="sliderUpdate(this,'chorSpread')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vChorWet">20%</div></div>
-            <input type="range" id="chorWet" min="0" max="100" step="1" value="20" oninput="sliderUpdate(this,'chorWet')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
-          </div>
-        </div>
+    </div>
+    <!-- EQ -->
+    <div class="fx">
+      <div class="fx-h" style="border-left:3px solid #ff9f43"><div class="fx-title" style="color:#ff9f43">3-BAND EQ</div><div class="tog-row" onclick="byp('eq')"><div class="tog-track on" id="t-eq"><div class="tog-thumb"></div></div><span class="tog-lbl">ON</span></div></div>
+      <div class="fx-b">
+        <canvas id="eqCvs" height="65"></canvas>
+        <div class="sl"><div class="sl-top"><div class="sl-label">LOW BASS</div><div class="sl-val" id="d-eqLow" style="color:#ff9f43">0 dB</div></div><input type="range" id="eqLow" min="-18" max="18" step=".5" value="0" oninput="upd(this)" style="background:linear-gradient(90deg,#ff9f43 var(--p,50%),var(--s3) var(--p,50%))"><style>#eqLow::-webkit-slider-thumb{background:#ff9f43;box-shadow:0 0 8px #ff9f43}</style></div>
+        <div class="sl"><div class="sl-top"><div class="sl-label">MID PRESENCE</div><div class="sl-val" id="d-eqMid" style="color:#ff9f43">+3 dB</div></div><input type="range" id="eqMid" min="-18" max="18" step=".5" value="3" oninput="upd(this)" style="background:linear-gradient(90deg,#ff9f43 var(--p,50%),var(--s3) var(--p,50%))"><style>#eqMid::-webkit-slider-thumb{background:#ff9f43;box-shadow:0 0 8px #ff9f43}</style></div>
+        <div class="sl"><div class="sl-top"><div class="sl-label">HIGH AIR</div><div class="sl-val" id="d-eqHigh" style="color:#ff9f43">+4 dB</div></div><input type="range" id="eqHigh" min="-18" max="18" step=".5" value="4" oninput="upd(this)" style="background:linear-gradient(90deg,#ff9f43 var(--p,50%),var(--s3) var(--p,50%))"><style>#eqHigh::-webkit-slider-thumb{background:#ff9f43;box-shadow:0 0 8px #ff9f43}</style></div>
+        <div class="sl"><div class="sl-top"><div class="sl-label">PRESENCE FREQ</div><div class="sl-val" id="d-eqMidF" style="color:#ff9f43">3 kHz</div></div><input type="range" id="eqMidF" min="500" max="8000" step="100" value="3000" oninput="upd(this)" style="background:linear-gradient(90deg,#ff9f43 var(--p,50%),var(--s3) var(--p,50%))"><style>#eqMidF::-webkit-slider-thumb{background:#ff9f43;box-shadow:0 0 8px #ff9f43}</style></div>
       </div>
-
-      <!-- LIMITER (soft, not compressor — prevents breaking) -->
-      <div class="fx-mod">
-        <div class="fx-head" style="border-left:3px solid var(--red)">
-          <div class="fx-title" style="color:var(--red)">SOFT LIMITER</div>
-          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.3);letter-spacing:1px">PROTECT</span>
-          <div class="toggle" onclick="toggleBypass('limiter')">
-            <div class="tog-track on" id="tog-limiter"><div class="tog-thumb"></div></div>
-            <span class="tog-label">ON</span>
-          </div>
-        </div>
-        <div class="fx-body">
-          <div style="font-size:11px;color:var(--text2);letter-spacing:1px;line-height:1.6;padding:8px;background:var(--s2);border-radius:4px;border:1px solid var(--border)">
-            Soft limiter gently prevents your voice from clipping or breaking. Keep threshold high (-6 to -3 dB) so it only catches peaks — not your whole voice.
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">THRESHOLD</div><div class="ctrl-val" id="vLimThresh">-6 dB</div></div>
-            <input type="range" class="red" id="limThresh" min="-30" max="-1" step="0.5" value="-6" oninput="sliderUpdate(this,'limThresh')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">RELEASE</div><div class="ctrl-val" id="vLimRelease">80 ms</div></div>
-            <input type="range" class="red" id="limRelease" min="10" max="500" step="5" value="80" oninput="sliderUpdate(this,'limRelease')">
-          </div>
-          <div class="ctrl">
-            <div class="ctrl-head"><div class="ctrl-label">MAKEUP GAIN</div><div class="ctrl-val" id="vLimMakeup">+2 dB</div></div>
-            <input type="range" class="red" id="limMakeup" min="-6" max="12" step="0.5" value="2" oninput="sliderUpdate(this,'limMakeup')">
-          </div>
-          <div id="gainReductionBar" style="height:6px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
-            <div id="grBar" style="height:100%;width:0%;background:var(--red);transition:width 0.08s;border-radius:3px"></div>
-          </div>
-          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-align:center">GAIN REDUCTION</div>
-        </div>
+    </div>
+    <!-- CHORUS -->
+    <div class="fx">
+      <div class="fx-h" style="border-left:3px solid var(--purple)"><div class="fx-title" style="color:var(--purple)">CHORUS</div><div class="tog-row" onclick="byp('chorus')"><div class="tog-track" id="t-chorus"><div class="tog-thumb"></div></div><span class="tog-lbl">OFF</span></div></div>
+      <div class="fx-b">
+        <div class="sl sl-purple"><div class="sl-top"><div class="sl-label">RATE</div><div class="sl-val" id="d-chorRate">0.8 Hz</div></div><input type="range" id="chorRate" min=".1" max="8" step=".1" value=".8" oninput="upd(this)"></div>
+        <div class="sl sl-purple"><div class="sl-top"><div class="sl-label">DEPTH</div><div class="sl-val" id="d-chorDepth">8 ms</div></div><input type="range" id="chorDepth" min="1" max="25" step=".5" value="8" oninput="upd(this)"></div>
+        <div class="sl sl-purple"><div class="sl-top"><div class="sl-label">SPREAD</div><div class="sl-val" id="d-chorSpread">80%</div></div><input type="range" id="chorSpread" min="0" max="100" step="1" value="80" oninput="upd(this)"></div>
+        <div class="sl sl-purple"><div class="sl-top"><div class="sl-label">WET MIX</div><div class="sl-val" id="d-chorWet">0%</div></div><input type="range" id="chorWet" min="0" max="100" step="1" value="0" oninput="upd(this)"></div>
       </div>
-
+    </div>
+    <!-- LIMITER -->
+    <div class="fx">
+      <div class="fx-h" style="border-left:3px solid var(--red)"><div class="fx-title" style="color:var(--red)">SOFT LIMITER</div><span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.3);letter-spacing:1px">NO BREAK</span><div class="tog-row" onclick="byp('limiter')"><div class="tog-track on" id="t-limiter"><div class="tog-thumb"></div></div><span class="tog-lbl">ON</span></div></div>
+      <div class="fx-b">
+        <div style="padding:8px;background:var(--s2);border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text2);line-height:1.6">Only catches loud peaks. Keep threshold at -4 dB — your normal singing will pass through untouched.</div>
+        <div class="sl sl-red"><div class="sl-top"><div class="sl-label">THRESHOLD</div><div class="sl-val" id="d-limThresh">-4 dB</div></div><input type="range" id="limThresh" min="-30" max="-1" step=".5" value="-4" oninput="upd(this)"></div>
+        <div class="sl sl-red"><div class="sl-top"><div class="sl-label">RELEASE</div><div class="sl-val" id="d-limRelease">60 ms</div></div><input type="range" id="limRelease" min="10" max="500" step="5" value="60" oninput="upd(this)"></div>
+        <div class="gr-wrap"><div class="gr-fill" id="grFill"></div></div>
+        <div style="font-size:9px;color:var(--text3);letter-spacing:2px;text-align:center">GAIN REDUCTION METER</div>
+      </div>
     </div>
   </div>
 </main>
-
-<footer>
-  NAAT STUDIO PRO — USE WIRED EARPHONES — BUILT WITH WEB AUDIO API — LOW LATENCY MODE ACTIVE
-</footer>
-
+<footer>NAAT STUDIO PRO &nbsp;&middot;&nbsp; USE WIRED EARPHONES &nbsp;&middot;&nbsp; OPEN IN CHROME &nbsp;&middot;&nbsp; WEB AUDIO API LOW LATENCY</footer>
 <script>
-// ═══════════════════════════════════════════════════════════════════════
-// AUDIO ENGINE — OPTIMIZED FOR MINIMUM LATENCY
-// ═══════════════════════════════════════════════════════════════════════
-let ctx = null, stream = null, running = false;
-let analyserIn = null, analyserOut = null;
-let animId = null;
-
-// Nodes
-let srcNode, inGain, outGain, dryGain, wetBus;
-let limiter, limMakeupGain;
-let eqLowNode, eqMidNode, eqHighNode;
-let echoDelay, echoFb, echoDampF, echoWetGain;
-let pingL, pingR, pingFbGain, pingPanL, pingPanR, pingWetGain;
-let convolver, revPreDelay, revDampF, revWetGain;
-let chorDelays = [], chorLFOs = [], chorLFOGains = [], chorPans = [], chorWetGain;
-
-const bypState = {echo:true,ping:true,reverb:true,eq:true,chorus:true,limiter:true};
-
-async function toggle() {
-  running ? stop() : await start();
-}
-
-async function start() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({audio:{
-      echoCancellation:false,
-      noiseSuppression:false,
-      autoGainControl:false,
-      latency:0,
-      channelCount:2
-    }});
-  } catch(e) {
-    document.getElementById('warn').style.display='block';
-    return;
-  }
-
-  // Use lowest possible latency
-  ctx = new (window.AudioContext||window.webkitAudioContext)({
-    latencyHint:'interactive',
-    sampleRate:48000
-  });
-  if(ctx.state==='suspended') await ctx.resume();
-
-  buildAudioGraph();
-  running = true;
-
-  document.getElementById('dot').classList.add('live');
-  document.getElementById('statusText').textContent='LIVE — PROCESSING';
-  document.getElementById('liveBadge').classList.add('show');
-  const btn = document.getElementById('btnStart');
-  btn.textContent = '■  STOP';
-  btn.classList.add('live');
-
-  const ms = Math.round((ctx.baseLatency||0.005)*1000);
-  document.getElementById('latVal').textContent = ms < 8 ? '<8' : ms;
-
+let AC=null,stream=null,running=false,anIn=null,anOut=null,animId=null;
+let srcNode,hpf,inGainNode,outGainNode,dryNode,wetBus;
+let limNode,limMakeup,eqL,eqM,eqH;
+let echoDly,echoFbNode,echoDampNode,echoWet;
+let pingL,pingR,pingFbNode,pingPanL,pingPanR,pingWet;
+let revConv,revPre,revDamp,revWet;
+let chDelays=[],chLFOs=[],chLFOG=[],chPans=[],chWet;
+const B={echo:true,ping:true,reverb:true,eq:true,chorus:false,limiter:true};
+async function toggle(){running?stop():await go()}
+async function go(){
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,latency:0,channelCount:2}});}
+  catch(e){document.getElementById('warn').style.display='block';return}
+  AC=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive',sampleRate:48000});
+  if(AC.state==='suspended')await AC.resume();
+  build();running=true;
+  document.getElementById('dot').classList.add('on');
+  document.getElementById('hTxt').textContent='LIVE';
+  const b=document.getElementById('btn');b.textContent='&#9646; STOP';b.classList.add('stop');
+  const ms=Math.round((AC.baseLatency||.005)*1000);
+  document.getElementById('hLat').textContent=ms<6?'<6':ms;
   startViz();
 }
-
-function buildAudioGraph() {
-  const C = ctx;
-
-  srcNode = C.createMediaStreamSource(stream);
-
-  // Analysers
-  analyserIn = C.createAnalyser(); analyserIn.fftSize=2048;
-  analyserOut = C.createAnalyser(); analyserOut.fftSize=2048;
-
-  // Input gain
-  inGain = C.createGain();
-  inGain.gain.value = dbToLin(v('inGain'));
-
-  // ── LIMITER (soft compressor with high ratio, fast attack, gentle knee) ──
-  limiter = C.createDynamicsCompressor();
-  limiter.threshold.value = v('limThresh');
-  limiter.ratio.value = 20; // brick-wall
-  limiter.attack.value = 0.001;
-  limiter.release.value = v('limRelease')/1000;
-  limiter.knee.value = 8;
-  limMakeupGain = C.createGain();
-  limMakeupGain.gain.value = dbToLin(v('limMakeup'));
-
-  // ── EQ ──
-  eqLowNode = C.createBiquadFilter();
-  eqLowNode.type='lowshelf'; eqLowNode.frequency.value=200; eqLowNode.gain.value=v('eqLow');
-  eqMidNode = C.createBiquadFilter();
-  eqMidNode.type='peaking'; eqMidNode.frequency.value=v('eqMidF'); eqMidNode.gain.value=v('eqMid'); eqMidNode.Q.value=1.2;
-  eqHighNode = C.createBiquadFilter();
-  eqHighNode.type='highshelf'; eqHighNode.frequency.value=8000; eqHighNode.gain.value=v('eqHigh');
-
-  // ── OUTPUT ──
-  outGain = C.createGain();
-  outGain.gain.value = v('outVol')/100;
-
-  // ── DRY / WET BUS ──
-  dryGain = C.createGain();
-  wetBus = C.createGain();
-  const dw = v('dryWet')/100;
-  dryGain.gain.value = 1-dw;
-  wetBus.gain.value = dw;
-
-  // ── ECHO ──
-  const preFX = C.createGain(); // send point for all effects
-  echoDelay = C.createDelay(2.0); echoDelay.delayTime.value = v('echoTime')/1000;
-  echoFb = C.createGain(); echoFb.gain.value = v('echoFb')/100;
-  echoDampF = C.createBiquadFilter(); echoDampF.type='lowpass'; echoDampF.frequency.value=v('echoDamp');
-  echoWetGain = C.createGain(); echoWetGain.gain.value = bypState.echo ? v('echoWet')/100 : 0;
-
-  preFX.connect(echoDelay);
-  echoDelay.connect(echoDampF);
-  echoDampF.connect(echoFb);
-  echoFb.connect(echoDelay);
-  echoDampF.connect(echoWetGain);
-  echoWetGain.connect(wetBus);
-
-  // ── PING-PONG ──
-  pingL = C.createDelay(2.0); pingL.delayTime.value=v('pingTime')/1000;
-  pingR = C.createDelay(2.0); pingR.delayTime.value=v('pingTime')/1000*0.7;
-  pingFbGain = C.createGain(); pingFbGain.gain.value=v('pingFb')/100;
-  const pw = v('pingWidth')/100;
-  pingPanL = C.createStereoPanner(); pingPanL.pan.value=-pw;
-  pingPanR = C.createStereoPanner(); pingPanR.pan.value=pw;
-  pingWetGain = C.createGain(); pingWetGain.gain.value=bypState.ping?v('pingWet')/100:0;
-
-  preFX.connect(pingL);
-  pingL.connect(pingPanL); pingPanL.connect(pingWetGain);
-  pingL.connect(pingFbGain); pingFbGain.connect(pingR);
-  pingR.connect(pingPanR); pingPanR.connect(pingWetGain);
-  pingR.connect(pingFbGain);
-  pingWetGain.connect(wetBus);
-
-  // ── REVERB ──
-  convolver = C.createConvolver();
-  revPreDelay = C.createDelay(0.3); revPreDelay.delayTime.value=v('revPre')/1000;
-  revDampF = C.createBiquadFilter(); revDampF.type='lowpass'; revDampF.frequency.value=7000;
-  revWetGain = C.createGain(); revWetGain.gain.value=bypState.reverb?v('revWet')/100:0;
+function build(){
+  const C=AC;
+  srcNode=C.createMediaStreamSource(stream);
+  anIn=C.createAnalyser();anIn.fftSize=2048;
+  anOut=C.createAnalyser();anOut.fftSize=2048;
+  hpf=C.createBiquadFilter();hpf.type='highpass';hpf.frequency.value=120;hpf.Q.value=0.7;
+  inGainNode=C.createGain();inGainNode.gain.value=dbl(g('inGain'));
+  limNode=C.createDynamicsCompressor();
+  limNode.threshold.value=g('limThresh');limNode.ratio.value=20;
+  limNode.attack.value=0.001;limNode.release.value=g('limRelease')/1000;limNode.knee.value=6;
+  limMakeup=C.createGain();limMakeup.gain.value=1.0;
+  eqL=C.createBiquadFilter();eqL.type='lowshelf';eqL.frequency.value=200;eqL.gain.value=g('eqLow');
+  eqM=C.createBiquadFilter();eqM.type='peaking';eqM.frequency.value=g('eqMidF');eqM.gain.value=g('eqMid');eqM.Q.value=1.0;
+  eqH=C.createBiquadFilter();eqH.type='highshelf';eqH.frequency.value=8000;eqH.gain.value=g('eqHigh');
+  outGainNode=C.createGain();outGainNode.gain.value=g('outVol')/100;
+  dryNode=C.createGain();wetBus=C.createGain();
+  const dw=g('dryWet')/100;dryNode.gain.value=1-dw*0.6;wetBus.gain.value=dw;
+  const sendPt=C.createGain();
+  echoDly=C.createDelay(2.0);echoDly.delayTime.value=g('echoTime')/1000;
+  echoFbNode=C.createGain();echoFbNode.gain.value=g('echoFb')/100;
+  echoDampNode=C.createBiquadFilter();echoDampNode.type='lowpass';echoDampNode.frequency.value=g('echoDamp');
+  echoWet=C.createGain();echoWet.gain.value=B.echo?g('echoWet')/100:0;
+  sendPt.connect(echoDly);echoDly.connect(echoDampNode);echoDampNode.connect(echoFbNode);echoFbNode.connect(echoDly);echoDampNode.connect(echoWet);echoWet.connect(wetBus);
+  pingL=C.createDelay(2.0);pingL.delayTime.value=g('pingTime')/1000;
+  pingR=C.createDelay(2.0);pingR.delayTime.value=g('pingTime')/1000*0.72;
+  pingFbNode=C.createGain();pingFbNode.gain.value=g('pingFb')/100;
+  const pw=g('pingWidth')/100;
+  pingPanL=C.createStereoPanner();pingPanL.pan.value=-pw;
+  pingPanR=C.createStereoPanner();pingPanR.pan.value=pw;
+  pingWet=C.createGain();pingWet.gain.value=B.ping?g('pingWet')/100:0;
+  sendPt.connect(pingL);pingL.connect(pingPanL);pingPanL.connect(pingWet);pingL.connect(pingFbNode);pingFbNode.connect(pingR);pingR.connect(pingPanR);pingPanR.connect(pingWet);pingR.connect(pingFbNode);pingWet.connect(wetBus);
+  revConv=C.createConvolver();revPre=C.createDelay(.3);revPre.delayTime.value=g('revPre')/1000;
+  revDamp=C.createBiquadFilter();revDamp.type='lowpass';revDamp.frequency.value=8000;
+  revWet=C.createGain();revWet.gain.value=B.reverb?g('revWet')/100:0;
   buildIR();
-
-  preFX.connect(revPreDelay);
-  revPreDelay.connect(convolver);
-  convolver.connect(revDampF);
-  revDampF.connect(revWetGain);
-  revWetGain.connect(wetBus);
-
-  // ── CHORUS ──
-  buildChorus(preFX);
-
-  // ── MASTER CHAIN ──
-  // Mic → analyserIn → inGain → limiter → makeupGain → EQ chain → preFX + dryGain
-  srcNode.connect(analyserIn);
-  analyserIn.connect(inGain);
-  inGain.connect(limiter);
-  limiter.connect(limMakeupGain);
-  limMakeupGain.connect(eqLowNode);
-  eqLowNode.connect(eqMidNode);
-  eqMidNode.connect(eqHighNode);
-  eqHighNode.connect(preFX);
-  eqHighNode.connect(dryGain);
-
-  dryGain.connect(outGain);
-  wetBus.connect(outGain);
-  outGain.connect(analyserOut);
-  outGain.connect(ctx.destination);
+  sendPt.connect(revPre);revPre.connect(revConv);revConv.connect(revDamp);revDamp.connect(revWet);revWet.connect(wetBus);
+  buildChorus(sendPt);
+  srcNode.connect(anIn);anIn.connect(hpf);hpf.connect(inGainNode);
+  inGainNode.connect(limNode);limNode.connect(limMakeup);
+  limMakeup.connect(eqL);eqL.connect(eqM);eqM.connect(eqH);
+  eqH.connect(sendPt);eqH.connect(dryNode);
+  dryNode.connect(outGainNode);wetBus.connect(outGainNode);
+  outGainNode.connect(anOut);outGainNode.connect(AC.destination);
 }
-
-function buildChorus(inputNode) {
-  const C = ctx;
-  chorDelays=[]; chorLFOs=[]; chorLFOGains=[]; chorPans=[];
-  chorWetGain = C.createGain();
-  chorWetGain.gain.value = bypState.chorus ? v('chorWet')/100 : 0;
-  const voices = 3;
-  const rate = v('chorRate');
-  const depth = v('chorDepth')/1000;
-  const spread = v('chorSpread')/100;
-
-  for(let i=0;i<voices;i++) {
-    const d = C.createDelay(0.1); d.delayTime.value=0.015 + i*0.007;
-    const lfo = C.createOscillator(); lfo.type='sine'; lfo.frequency.value=rate + i*0.13;
-    const lg = C.createGain(); lg.gain.value=depth;
-    const pan = C.createStereoPanner();
-    pan.pan.value = voices>1 ? ((i/(voices-1))*2-1)*spread : 0;
-    lfo.connect(lg); lg.connect(d.delayTime);
-    inputNode.connect(d); d.connect(pan); pan.connect(chorWetGain);
-    lfo.start();
-    chorDelays.push(d); chorLFOs.push(lfo); chorLFOGains.push(lg); chorPans.push(pan);
+function buildChorus(src){
+  const C=AC;chDelays=[];chLFOs=[];chLFOG=[];chPans=[];
+  chWet=C.createGain();chWet.gain.value=B.chorus?g('chorWet')/100:0;
+  const n=3,rt=g('chorRate'),dp=g('chorDepth')/1000,sp=g('chorSpread')/100;
+  for(let i=0;i<n;i++){
+    const d=C.createDelay(.1);d.delayTime.value=.015+i*.007;
+    const lfo=C.createOscillator();lfo.type='sine';lfo.frequency.value=rt+i*.11;
+    const lg=C.createGain();lg.gain.value=dp;
+    const pan=C.createStereoPanner();pan.pan.value=n>1?((i/(n-1))*2-1)*sp:0;
+    lfo.connect(lg);lg.connect(d.delayTime);src.connect(d);d.connect(pan);pan.connect(chWet);lfo.start();
+    chDelays.push(d);chLFOs.push(lfo);chLFOG.push(lg);chPans.push(pan);
   }
-  chorWetGain.connect(wetBus);
+  chWet.connect(wetBus);
 }
-
-function buildIR() {
-  if(!ctx||!convolver) return;
-  const sr = ctx.sampleRate;
-  const decay = v('revDecay');
-  const size = v('revSize')/100;
-  const len = Math.floor(sr * decay);
-  const ir = ctx.createBuffer(2, len, sr);
-  for(let c=0;c<2;c++) {
-    const ch = ir.getChannelData(c);
-    for(let i=0;i<len;i++) {
-      const t = i/sr;
-      ch[i] = (Math.random()*2-1) * size * Math.exp(-5*t/decay);
-      // Early reflections shimmer
-      if(i < sr*0.05) ch[i] *= 1.4;
-    }
-  }
-  convolver.buffer = ir;
+function buildIR(){
+  if(!AC||!revConv)return;
+  const sr=AC.sampleRate,decay=g('revDecay'),size=g('revSize')/100,len=Math.floor(sr*decay);
+  const ir=AC.createBuffer(2,len,sr);
+  for(let c=0;c<2;c++){const ch=ir.getChannelData(c);for(let i=0;i<len;i++){const t=i/sr;ch[i]=(Math.random()*2-1)*size*Math.exp(-4.5*t/decay);if(i<sr*.04)ch[i]*=1.3;}}
+  revConv.buffer=ir;
 }
-
-function stop() {
-  running=false;
-  if(stream) stream.getTracks().forEach(t=>t.stop()); stream=null;
-  chorLFOs.forEach(l=>{try{l.stop()}catch(e){}});
-  if(ctx){ctx.close();ctx=null;}
+function stop(){
+  running=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
+  chLFOs.forEach(l=>{try{l.stop()}catch(_){}});if(AC){AC.close();AC=null;}
   cancelAnimationFrame(animId);
-  document.getElementById('dot').classList.remove('live');
-  document.getElementById('statusText').textContent='READY';
-  document.getElementById('liveBadge').classList.remove('show');
-  const btn=document.getElementById('btnStart');
-  btn.textContent='▶  START'; btn.classList.remove('live');
-  document.getElementById('latVal').textContent='—';
-  ['vuIn','vuOut'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width='0%'});
-  clearViz();
+  document.getElementById('dot').classList.remove('on');document.getElementById('hTxt').textContent='READY';
+  const b=document.getElementById('btn');b.textContent='&#9654; START';b.classList.remove('stop');
+  document.getElementById('hLat').textContent='—';
+  ['vuInF','vuOutF'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width='0%'});clearViz();
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// PARAMETER UPDATES
-// ═══════════════════════════════════════════════════════════════════════
-function onParam(id, val) {
-  if(!ctx) return;
-  const t = ctx.currentTime;
-  const ramp = (node, v, time=0.015) => node.setTargetAtTime(v, t, time);
-  switch(id) {
-    case 'inGain': ramp(inGain.gain, dbToLin(val)); break;
-    case 'outVol': ramp(outGain.gain, val/100); break;
-    case 'dryWet': dryGain.gain.setTargetAtTime(1-val/100,t,0.02); wetBus.gain.setTargetAtTime(val/100,t,0.02); break;
-    case 'eqLow': if(bypState.eq) ramp(eqLowNode.gain, val); break;
-    case 'eqMid': if(bypState.eq) ramp(eqMidNode.gain, val); break;
-    case 'eqHigh': if(bypState.eq) ramp(eqHighNode.gain, val); break;
-    case 'eqMidF': ramp(eqMidNode.frequency, val); break;
-    case 'echoTime': ramp(echoDelay.delayTime, val/1000); break;
-    case 'echoFb': ramp(echoFb.gain, val/100); break;
-    case 'echoDamp': ramp(echoDampF.frequency, val); break;
-    case 'echoWet': if(bypState.echo) ramp(echoWetGain.gain, val/100); break;
-    case 'pingTime': ramp(pingL.delayTime,val/1000); ramp(pingR.delayTime,val/1000*0.7); break;
-    case 'pingFb': ramp(pingFbGain.gain, val/100); break;
-    case 'pingWidth': ramp(pingPanL.pan,-val/100); ramp(pingPanR.pan,val/100); break;
-    case 'pingWet': if(bypState.ping) ramp(pingWetGain.gain,val/100); break;
-    case 'revSize': case 'revDecay': buildIR(); break;
-    case 'revPre': ramp(revPreDelay.delayTime,val/1000); break;
-    case 'revWet': if(bypState.reverb) ramp(revWetGain.gain,val/100); break;
-    case 'chorRate': chorLFOs.forEach((l,i)=>ramp(l.frequency,val+i*0.13)); break;
-    case 'chorDepth': chorLFOGains.forEach(g=>ramp(g.gain,val/1000)); break;
-    case 'chorSpread': chorPans.forEach((p,i)=>{ const n=chorPans.length; ramp(p.pan,n>1?((i/(n-1))*2-1)*(val/100):0); }); break;
-    case 'chorWet': if(bypState.chorus) ramp(chorWetGain.gain,val/100); break;
-    case 'limThresh': ramp(limiter.threshold,val); break;
-    case 'limRelease': ramp(limiter.release,val/1000); break;
-    case 'limMakeup': ramp(limMakeupGain.gain,dbToLin(val)); break;
+function param(id,val){
+  if(!AC)return;const t=AC.currentTime,rt=(nd,v)=>nd.setTargetAtTime(v,t,.015);
+  switch(id){
+    case'inGain':rt(inGainNode.gain,dbl(val));break;case'outVol':rt(outGainNode.gain,val/100);break;
+    case'dryWet':dryNode.gain.setTargetAtTime(1-val/100*.6,t,.02);wetBus.gain.setTargetAtTime(val/100,t,.02);break;
+    case'eqLow':if(B.eq)rt(eqL.gain,val);break;case'eqMid':if(B.eq)rt(eqM.gain,val);break;case'eqHigh':if(B.eq)rt(eqH.gain,val);break;
+    case'eqMidF':rt(eqM.frequency,val);break;
+    case'echoTime':rt(echoDly.delayTime,val/1000);break;case'echoFb':rt(echoFbNode.gain,val/100);break;
+    case'echoDamp':rt(echoDampNode.frequency,val);break;case'echoWet':if(B.echo)rt(echoWet,val/100);break;
+    case'pingTime':rt(pingL.delayTime,val/1000);rt(pingR.delayTime,val/1000*.72);break;
+    case'pingFb':rt(pingFbNode.gain,val/100);break;case'pingWidth':rt(pingPanL.pan,-val/100);rt(pingPanR.pan,val/100);break;case'pingWet':if(B.ping)rt(pingWet,val/100);break;
+    case'revSize':case'revDecay':buildIR();break;case'revPre':rt(revPre.delayTime,val/1000);break;case'revWet':if(B.reverb)rt(revWet,val/100);break;
+    case'chorRate':chLFOs.forEach((l,i)=>rt(l.frequency,val+i*.11));break;case'chorDepth':chLFOG.forEach(lg=>rt(lg.gain,val/1000));break;
+    case'chorSpread':chPans.forEach((p,i)=>{const n=chPans.length;rt(p.pan,n>1?((i/(n-1))*2-1)*(val/100):0)});break;
+    case'chorWet':if(B.chorus)rt(chWet,val/100);break;
+    case'limThresh':rt(limNode.threshold,val);break;case'limRelease':rt(limNode.release,val/1000);break;
   }
-  drawEQ();
+  updateEchoViz();
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// BYPASS
-// ═══════════════════════════════════════════════════════════════════════
-function toggleBypass(fx) {
-  bypState[fx] = !bypState[fx];
-  const on = bypState[fx];
-  const track = document.getElementById('tog-'+fx);
-  if(track) {
-    track.classList.toggle('on',on);
-    const lbl = track.nextElementSibling;
-    if(lbl) lbl.textContent = on ? 'ON' : 'OFF';
-  }
-  // Update quick buttons
-  const qmap = {echo:'qEcho',reverb:'qReverb',chorus:'qChorus',eq:'qEQ'};
-  if(qmap[fx]) {
-    const qb = document.getElementById(qmap[fx]);
-    if(qb) qb.textContent = (fx.charAt(0).toUpperCase()+fx.slice(1)) + (on?' ON':' OFF');
-  }
-  if(!ctx) return;
-  const t = ctx.currentTime;
-  switch(fx) {
-    case 'echo': echoWetGain.gain.setTargetAtTime(on?v('echoWet')/100:0,t,0.02); break;
-    case 'ping': pingWetGain.gain.setTargetAtTime(on?v('pingWet')/100:0,t,0.02); break;
-    case 'reverb': revWetGain.gain.setTargetAtTime(on?v('revWet')/100:0,t,0.02); break;
-    case 'chorus': chorWetGain.gain.setTargetAtTime(on?v('chorWet')/100:0,t,0.02); break;
-    case 'eq':
-      eqLowNode.gain.setTargetAtTime(on?v('eqLow'):0,t,0.02);
-      eqMidNode.gain.setTargetAtTime(on?v('eqMid'):0,t,0.02);
-      eqHighNode.gain.setTargetAtTime(on?v('eqHigh'):0,t,0.02); break;
-    case 'limiter':
-      limiter.threshold.setTargetAtTime(on?v('limThresh'):0,t,0.02);
-      limiter.ratio.setTargetAtTime(on?20:1,t,0.02); break;
+function updateEchoViz(){
+  const fb=g('echoFb')/100;
+  [0,1,2,3,4,5].forEach(i=>{const el=document.getElementById('ev'+i);if(!el)return;const h=Math.max(Math.round(Math.pow(fb,i)*100),2);el.style.height=h+'%';el.style.background='hsl('+(48-i*4)+','+(90-i*10)+'%,'+(55-i*7)+'%)';});
+}
+function byp(fx){
+  B[fx]=!B[fx];const on=B[fx];
+  const tr=document.getElementById('t-'+fx);if(tr){tr.classList.toggle('on',on);const lb=tr.nextElementSibling;if(lb)lb.textContent=on?'ON':'OFF';}
+  const ql={echo:'qe',reverb:'qr',chorus:'qc',eq:'qq'}[fx];
+  if(ql){const qb=document.getElementById(ql);if(qb)qb.textContent=fx.charAt(0).toUpperCase()+fx.slice(1)+(on?' ON':' OFF');}
+  if(!AC)return;const t=AC.currentTime;
+  switch(fx){
+    case'echo':echoWet.gain.setTargetAtTime(on?g('echoWet')/100:0,t,.02);break;
+    case'ping':pingWet.gain.setTargetAtTime(on?g('pingWet')/100:0,t,.02);break;
+    case'reverb':revWet.gain.setTargetAtTime(on?g('revWet')/100:0,t,.02);break;
+    case'chorus':chWet.gain.setTargetAtTime(on?g('chorWet')/100:0,t,.02);break;
+    case'eq':eqL.gain.setTargetAtTime(on?g('eqLow'):0,t,.02);eqM.gain.setTargetAtTime(on?g('eqMid'):0,t,.02);eqH.gain.setTargetAtTime(on?g('eqHigh'):0,t,.02);break;
+    case'limiter':limNode.threshold.setTargetAtTime(on?g('limThresh'):0,t,.02);limNode.ratio.setTargetAtTime(on?20:1,t,.02);break;
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// REVERB TYPE
-// ═══════════════════════════════════════════════════════════════════════
-function setRevType(type, btn) {
-  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const types = {
-    room:{size:40,decay:0.9,pre:10},
-    hall:{size:75,decay:3.5,pre:25},
-    plate:{size:55,decay:2.0,pre:5},
-    mosque:{size:95,decay:6.5,pre:50}
-  };
-  const p = types[type];
-  setVal('revSize',p.size); setVal('revDecay',p.decay); setVal('revPre',p.pre);
-  updateDisplays(); buildIR();
-  onParam('revPre',p.pre);
+function revType(type,btn){
+  document.querySelectorAll('.rt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  const P={room:{size:40,decay:.9,pre:8},hall:{size:78,decay:3.8,pre:28},mosque:{size:96,decay:7,pre:55},plate:{size:52,decay:2,pre:4}};
+  const p=P[type];sv('revSize',p.size);sv('revDecay',p.decay);sv('revPre',p.pre);
+  refreshDisplays();buildIR();param('revPre',p.pre);
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// TAP TEMPO
-// ═══════════════════════════════════════════════════════════════════════
-const taps = {echo:[],ping:[]};
-function doTap(which) {
-  const now = performance.now();
-  taps[which].push(now);
-  if(taps[which].length>4) taps[which].shift();
-  if(taps[which].length<2) return;
-  const diffs=[];
-  for(let i=1;i<taps[which].length;i++) diffs.push(taps[which][i]-taps[which][i-1]);
-  const avg = diffs.reduce((a,b)=>a+b,0)/diffs.length;
-  const bpm = Math.round(60000/avg);
-  const ms = Math.min(Math.round(avg), which==='echo'?900:800);
-  const tapEl = document.getElementById(which==='echo'?'tapEcho':'tapPing');
-  if(tapEl) tapEl.textContent = bpm+' BPM';
-  const slId = which==='echo'?'echoTime':'pingTime';
-  setVal(slId, ms); updateDisplays(); onParam(slId, ms);
+const taps={echo:[],ping:[]};
+function doTap(which){
+  const now=performance.now();taps[which].push(now);if(taps[which].length>4)taps[which].shift();if(taps[which].length<2)return;
+  const diffs=[];for(let i=1;i<taps[which].length;i++)diffs.push(taps[which][i]-taps[which][i-1]);
+  const avg=diffs.reduce((a,b)=>a+b,0)/diffs.length,bpm=Math.round(60000/avg),ms=Math.min(Math.round(avg),which==='echo'?900:800);
+  const disp=document.getElementById(which==='echo'?'tapEcho':'tapPing');if(disp)disp.textContent=bpm+' BPM';
+  const sid=which==='echo'?'echoTime':'pingTime';sv(sid,ms);refreshDisplays();param(sid,ms);
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// PRESETS
-// ═══════════════════════════════════════════════════════════════════════
-const presets = {
-  naat:{inGain:0,outVol:85,dryWet:45,eqLow:2,eqMid:3,eqHigh:3,eqMidF:2500,echoTime:340,echoFb:55,echoDamp:8000,echoWet:48,pingTime:510,pingFb:40,pingWidth:100,pingWet:20,revSize:50,revDecay:2.2,revPre:15,revWet:28,chorRate:0.8,chorDepth:8,chorSpread:80,chorWet:18,limThresh:-6,limRelease:80,limMakeup:2},
-  grand:{inGain:0,outVol:80,dryWet:60,eqLow:0,eqMid:2,eqHigh:4,eqMidF:3000,echoTime:420,echoFb:60,echoDamp:7000,echoWet:40,pingTime:630,pingFb:50,pingWidth:100,pingWet:30,revSize:85,revDecay:4.5,revPre:30,revWet:45,chorRate:0.5,chorDepth:6,chorSpread:90,chorWet:15,limThresh:-4,limRelease:100,limMakeup:1},
-  studio:{inGain:2,outVol:82,dryWet:30,eqLow:-1,eqMid:3,eqHigh:5,eqMidF:3500,echoTime:280,echoFb:35,echoDamp:10000,echoWet:22,pingTime:400,pingFb:28,pingWidth:80,pingWet:15,revSize:35,revDecay:1.2,revPre:12,revWet:20,chorRate:1.2,chorDepth:5,chorSpread:70,chorWet:12,limThresh:-4,limRelease:60,limMakeup:2},
-  intimate:{inGain:0,outVol:80,dryWet:25,eqLow:3,eqMid:2,eqHigh:1,eqMidF:2000,echoTime:180,echoFb:30,echoDamp:6000,echoWet:18,pingTime:250,pingFb:20,pingWidth:60,pingWet:10,revSize:25,revDecay:0.8,revPre:8,revWet:18,chorRate:0.6,chorDepth:10,chorSpread:60,chorWet:15,limThresh:-5,limRelease:70,limMakeup:1},
-  mosque:{inGain:0,outVol:78,dryWet:70,eqLow:1,eqMid:1,eqHigh:2,eqMidF:2000,echoTime:500,echoFb:65,echoDamp:6000,echoWet:55,pingTime:750,pingFb:58,pingWidth:100,pingWet:40,revSize:98,revDecay:7.0,revPre:60,revWet:60,chorRate:0.3,chorDepth:12,chorSpread:100,chorWet:10,limThresh:-4,limRelease:150,limMakeup:0},
-  dry:{inGain:0,outVol:85,dryWet:0,eqLow:0,eqMid:0,eqHigh:0,eqMidF:2500,echoTime:340,echoFb:55,echoDamp:8000,echoWet:0,pingTime:480,pingFb:45,pingWidth:100,pingWet:0,revSize:60,revDecay:2.5,revPre:15,revWet:0,chorRate:0.8,chorDepth:8,chorSpread:80,chorWet:0,limThresh:-6,limRelease:80,limMakeup:0}
+const P={
+  naat:{inGain:0,outVol:85,dryWet:50,eqLow:0,eqMid:3,eqHigh:4,eqMidF:3000,echoTime:340,echoFb:65,echoDamp:16000,echoWet:60,pingTime:510,pingFb:40,pingWidth:100,pingWet:18,revSize:55,revDecay:2.0,revPre:12,revWet:22,chorRate:.8,chorDepth:8,chorSpread:80,chorWet:0,limThresh:-4,limRelease:60},
+  echo_only:{inGain:0,outVol:85,dryWet:55,eqLow:0,eqMid:2,eqHigh:3,eqMidF:3000,echoTime:360,echoFb:62,echoDamp:20000,echoWet:65,pingTime:540,pingFb:30,pingWidth:100,pingWet:12,revSize:20,revDecay:.5,revPre:5,revWet:8,chorRate:.8,chorDepth:8,chorSpread:80,chorWet:0,limThresh:-4,limRelease:60},
+  mosque:{inGain:0,outVol:80,dryWet:65,eqLow:1,eqMid:1,eqHigh:2,eqMidF:2000,echoTime:480,echoFb:70,echoDamp:12000,echoWet:58,pingTime:720,pingFb:55,pingWidth:100,pingWet:35,revSize:96,revDecay:7,revPre:55,revWet:55,chorRate:.3,chorDepth:12,chorSpread:100,chorWet:0,limThresh:-4,limRelease:100},
+  grand:{inGain:0,outVol:80,dryWet:60,eqLow:0,eqMid:2,eqHigh:4,eqMidF:3500,echoTime:420,echoFb:60,echoDamp:14000,echoWet:45,pingTime:630,pingFb:48,pingWidth:100,pingWet:28,revSize:85,revDecay:4.5,revPre:30,revWet:40,chorRate:.6,chorDepth:7,chorSpread:90,chorWet:10,limThresh:-4,limRelease:80},
+  studio:{inGain:2,outVol:82,dryWet:30,eqLow:-1,eqMid:3,eqHigh:5,eqMidF:3500,echoTime:280,echoFb:35,echoDamp:18000,echoWet:25,pingTime:420,pingFb:25,pingWidth:70,pingWet:12,revSize:35,revDecay:1.2,revPre:10,revWet:18,chorRate:1.2,chorDepth:5,chorSpread:70,chorWet:12,limThresh:-4,limRelease:50},
+  dry:{inGain:0,outVol:85,dryWet:0,eqLow:0,eqMid:0,eqHigh:0,eqMidF:3000,echoTime:340,echoFb:65,echoDamp:16000,echoWet:0,pingTime:510,pingFb:40,pingWidth:100,pingWet:0,revSize:55,revDecay:2,revPre:12,revWet:0,chorRate:.8,chorDepth:8,chorSpread:80,chorWet:0,limThresh:-4,limRelease:60}
 };
-
-function applyPreset(name, el) {
-  document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const p = presets[name];
-  Object.keys(p).forEach(k=>{setVal(k,p[k]); onParam(k,p[k]);});
-  updateDisplays(); buildIR();
+function preset(name,el){
+  document.querySelectorAll('.pc').forEach(c=>c.classList.remove('on'));if(el)el.classList.add('on');
+  const p=P[name];Object.keys(p).forEach(k=>{sv(k,p[k]);param(k,p[k]);});refreshDisplays();buildIR();
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// SLIDER DISPLAY SYSTEM
-// ═══════════════════════════════════════════════════════════════════════
-const fmt = {
-  inGain: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
-  outVol: n=>n+'%',
-  dryWet: n=>n+'%',
-  eqLow: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
-  eqMid: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
-  eqHigh: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
-  eqMidF: n=>n>=1000?(n/1000).toFixed(1)+' kHz':n+' Hz',
-  echoTime: n=>n+' ms',
-  echoFb: n=>n+'%',
-  echoDamp: n=>n>=1000?(n/1000).toFixed(0)+' kHz':n+' Hz',
-  echoWet: n=>n+'%',
-  pingTime: n=>n+' ms',
-  pingFb: n=>n+'%',
-  pingWidth: n=>n+'%',
-  pingWet: n=>n+'%',
-  revSize: n=>n+'%',
-  revDecay: n=>parseFloat(n).toFixed(1)+' s',
-  revPre: n=>n+' ms',
-  revWet: n=>n+'%',
-  chorRate: n=>parseFloat(n).toFixed(1)+' Hz',
-  chorDepth: n=>parseFloat(n).toFixed(0)+' ms',
-  chorSpread: n=>n+'%',
-  chorWet: n=>n+'%',
-  limThresh: n=>parseFloat(n).toFixed(1)+' dB',
-  limRelease: n=>n+' ms',
-  limMakeup: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB'
+const FMT={
+  inGain:n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',outVol:n=>n+'%',dryWet:n=>n+'%',
+  eqLow:n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',eqMid:n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',eqHigh:n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
+  eqMidF:n=>n>=1000?(n/1000).toFixed(1)+' kHz':n+' Hz',
+  echoTime:n=>n+' ms',echoFb:n=>n+'%',echoDamp:n=>n>=1000?(n/1000).toFixed(0)+' kHz':n+' Hz',echoWet:n=>n+'%',
+  pingTime:n=>n+' ms',pingFb:n=>n+'%',pingWidth:n=>n+'%',pingWet:n=>n+'%',
+  revSize:n=>n+'%',revDecay:n=>parseFloat(n).toFixed(1)+' s',revPre:n=>n+' ms',revWet:n=>n+'%',
+  chorRate:n=>parseFloat(n).toFixed(1)+' Hz',chorDepth:n=>parseFloat(n).toFixed(0)+' ms',chorSpread:n=>n+'%',chorWet:n=>n+'%',
+  limThresh:n=>parseFloat(n).toFixed(1)+' dB',limRelease:n=>n+' ms'
 };
-
-function sliderUpdate(el, id) {
-  const val = parseFloat(el.value);
-  // Update gradient fill
-  const min=parseFloat(el.min), max=parseFloat(el.max);
-  const pct = Math.round((val-min)/(max-min)*100);
-  el.style.setProperty('--pct', pct+'%');
-  // Update value display
-  const disp = document.getElementById('v'+id.charAt(0).toUpperCase()+id.slice(1));
-  if(disp && fmt[id]) disp.textContent = fmt[id](val);
-  onParam(id, val);
-  if(id.startsWith('eq')) drawEQ();
+function upd(el){
+  const id=el.id,val=parseFloat(el.value);
+  const min=parseFloat(el.min),max=parseFloat(el.max);
+  el.style.setProperty('--p',Math.round((val-min)/(max-min)*100)+'%');
+  const d=document.getElementById('d-'+id);if(d&&FMT[id])d.textContent=FMT[id](val);
+  if(id==='echoTime'){const b=document.getElementById('echoTimeBig');if(b)b.textContent=Math.round(val);}
+  param(id,val);if(id.startsWith('eq'))drawEQ();if(id.startsWith('echo'))updateEchoViz();
 }
-
-function updateDisplays() {
-  Object.keys(fmt).forEach(id=>{
-    const el=document.getElementById(id);
-    const disp=document.getElementById('v'+id.charAt(0).toUpperCase()+id.slice(1));
-    if(el&&disp) {
-      disp.textContent=fmt[id](parseFloat(el.value));
-      const min=parseFloat(el.min),max=parseFloat(el.max),val=parseFloat(el.value);
-      el.style.setProperty('--pct',Math.round((val-min)/(max-min)*100)+'%');
-    }
+function refreshDisplays(){
+  Object.keys(FMT).forEach(id=>{
+    const el=document.getElementById(id),d=document.getElementById('d-'+id);if(!el)return;
+    const val=parseFloat(el.value),min=parseFloat(el.min),max=parseFloat(el.max);
+    el.style.setProperty('--p',Math.round((val-min)/(max-min)*100)+'%');
+    if(d&&FMT[id])d.textContent=FMT[id](val);
+    if(id==='echoTime'){const b=document.getElementById('echoTimeBig');if(b)b.textContent=Math.round(val);}
   });
+  drawEQ();updateEchoViz();
 }
-
-function setVal(id, val) {
-  const el=document.getElementById(id);
-  if(el) el.value=val;
+function sv(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+const g=id=>parseFloat(document.getElementById(id).value);
+const dbl=db=>Math.pow(10,db/20);
+function drawEQ(){
+  const c=document.getElementById('eqCvs');if(!c)return;
+  const g2=c.getContext('2d'),W=c.width,H=c.height;
+  g2.clearRect(0,0,W,H);g2.fillStyle='#13131e';g2.fillRect(0,0,W,H);
+  g2.strokeStyle='rgba(255,255,255,.05)';g2.lineWidth=.5;g2.beginPath();g2.moveTo(0,H/2);g2.lineTo(W,H/2);g2.stroke();
+  const lG=g('eqLow'),mG=g('eqMid'),hG=g('eqHigh'),mF=g('eqMidF');
+  g2.strokeStyle='#ff9f43';g2.lineWidth=2;g2.shadowColor='#ff9f43';g2.shadowBlur=6;g2.beginPath();
+  for(let i=0;i<W;i++){const f=20*Math.pow(1000,i/W);const low=lG/(1+Math.pow(f/200,2));const mid=mG/(1+Math.pow(1.0*(f/mF-mF/f),2));const hi=hG/(1+Math.pow(8000/f,2));const db=low+mid+hi,y=H/2-(db/18)*(H/2-4);i===0?g2.moveTo(i,y):g2.lineTo(i,y);}
+  g2.stroke();
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// EQ CURVE
-// ═══════════════════════════════════════════════════════════════════════
-function drawEQ() {
-  const c=document.getElementById('eqCanvas'); if(!c) return;
-  const g=c.getContext('2d'), W=c.width, H=c.height;
-  g.clearRect(0,0,W,H);
-  g.fillStyle='#181410'; g.fillRect(0,0,W,H);
-
-  // Grid
-  g.strokeStyle='rgba(255,255,255,0.06)'; g.lineWidth=0.5;
-  g.beginPath(); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
-
-  const lowG=parseFloat(document.getElementById('eqLow').value);
-  const midG=parseFloat(document.getElementById('eqMid').value);
-  const hiG=parseFloat(document.getElementById('eqHigh').value);
-  const midF=parseFloat(document.getElementById('eqMidF').value);
-
-  g.strokeStyle='#ff9f43'; g.lineWidth=2; g.shadowColor='#ff9f43'; g.shadowBlur=6;
-  g.beginPath();
-  for(let i=0;i<W;i++) {
-    const f=20*Math.pow(1000,i/W);
-    const low=lowG/(1+Math.pow(f/200,2));
-    const mid=midG/(1+Math.pow(1.2*(f/midF-midF/f),2));
-    const hi=hiG/(1+Math.pow(8000/f,2));
-    const db=low+mid+hi;
-    const y=H/2-(db/18)*(H/2-4);
-    i===0?g.moveTo(i,y):g.lineTo(i,y);
-  }
-  g.stroke();
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// VISUALIZATION
-// ═══════════════════════════════════════════════════════════════════════
-function startViz() {
-  const inBuf=new Uint8Array(analyserIn.frequencyBinCount);
-  const outBuf=new Uint8Array(analyserOut.frequencyBinCount);
-  const waveBuf=new Uint8Array(analyserOut.fftSize);
-
-  function frame() {
-    if(!running) return;
-    animId=requestAnimationFrame(frame);
-
-    analyserIn.getByteFrequencyData(inBuf);
-    analyserOut.getByteFrequencyData(outBuf);
-
-    // VU bars
-    const inLvl=inBuf.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;
-    const outLvl=outBuf.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;
-    document.getElementById('vuIn').style.width=Math.min(inLvl*2,100)+'%';
-    document.getElementById('vuOut').style.width=Math.min(outLvl*2,100)+'%';
-
-    // Gain reduction
-    if(limiter) {
-      const gr=Math.abs(limiter.reduction||0);
-      document.getElementById('grBar').style.width=Math.min(gr*5,100)+'%';
-    }
-
-    // Canvas viz
-    const mode=document.getElementById('vizMode').value;
-    const vc=document.getElementById('vizCanvas');
-    if(!vc) return;
-    const g=vc.getContext('2d'), W=vc.width, H=vc.height;
-
-    if(mode==='wave') {
-      analyserOut.getByteTimeDomainData(waveBuf);
-      g.fillStyle='#0f0d09'; g.fillRect(0,0,W,H);
-      // Grid lines
-      g.strokeStyle='rgba(201,149,42,0.08)'; g.lineWidth=0.5;
-      for(let i=1;i<4;i++){g.beginPath();g.moveTo(0,H*i/4);g.lineTo(W,H*i/4);g.stroke();}
-      g.strokeStyle='#c9952a'; g.lineWidth=1.5; g.shadowColor='rgba(201,149,42,0.5)'; g.shadowBlur=6;
-      g.beginPath();
-      const step=W/waveBuf.length;
-      for(let i=0;i<waveBuf.length;i++){
-        const y=((waveBuf[i]/128)-1)*(H/2)+H/2;
-        i===0?g.moveTo(0,y):g.lineTo(i*step,y);
-      }
-      g.stroke();
-    } else {
-      g.fillStyle='#0f0d09'; g.fillRect(0,0,W,H);
-      const bars=64, bw=W/bars-1;
-      for(let i=0;i<bars;i++){
-        const idx=Math.floor((i/bars)*outBuf.length);
-        const val=outBuf[idx]/255;
-        const h=val*H;
-        const r=150+i*1.5, gb=80+val*80;
-        g.fillStyle=`rgb(${Math.round(r)},${Math.round(gb)},30)`;
-        g.fillRect(i*(bw+1),H-h,bw,h);
-      }
+function startViz(){
+  const iB=new Uint8Array(anIn.frequencyBinCount),oB=new Uint8Array(anOut.frequencyBinCount),wB=new Uint8Array(anOut.fftSize);
+  function fr(){
+    if(!running)return;animId=requestAnimationFrame(fr);
+    anIn.getByteFrequencyData(iB);anOut.getByteFrequencyData(oB);
+    const il=iB.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;const ol=oB.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;
+    document.getElementById('vuInF').style.width=Math.min(il*2.2,100)+'%';document.getElementById('vuOutF').style.width=Math.min(ol*2.2,100)+'%';
+    if(limNode){const gr=Math.abs(limNode.reduction||0);document.getElementById('grFill').style.width=Math.min(gr*6,100)+'%';}
+    const vc=document.getElementById('vizCvs');if(!vc)return;
+    const gc=vc.getContext('2d'),W=vc.width,H=vc.height;
+    if(document.getElementById('vizMode').value==='wave'){
+      anOut.getByteTimeDomainData(wB);gc.fillStyle='#0a0a12';gc.fillRect(0,0,W,H);
+      gc.strokeStyle='rgba(212,160,23,.06)';gc.lineWidth=.5;for(let i=1;i<4;i++){gc.beginPath();gc.moveTo(0,H*i/4);gc.lineTo(W,H*i/4);gc.stroke();}
+      gc.strokeStyle='#d4a017';gc.lineWidth=2;gc.shadowColor='rgba(212,160,23,.5)';gc.shadowBlur=8;gc.beginPath();
+      const st=W/wB.length;for(let i=0;i<wB.length;i++){const y=((wB[i]/128)-1)*(H/2)+H/2;i===0?gc.moveTo(0,y):gc.lineTo(i*st,y);}gc.stroke();
+    }else{
+      gc.fillStyle='#0a0a12';gc.fillRect(0,0,W,H);const bars=72,bw=W/bars-1;
+      for(let i=0;i<bars;i++){const idx=Math.floor((i/bars)*oB.length);const v=oB[idx]/255;const h=v*H;gc.fillStyle='hsl('+(40+i*1.2)+',85%,'+(35+v*30)+'%)';gc.fillRect(i*(bw+1),H-h,bw,h);}
     }
   }
-  frame();
+  fr();
 }
-
-function clearViz() {
-  const vc=document.getElementById('vizCanvas');
-  if(vc){const g=vc.getContext('2d');g.fillStyle='#0f0d09';g.fillRect(0,0,vc.width,vc.height);}
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════════════
-const dbToLin=db=>Math.pow(10,db/20);
-const v=id=>parseFloat(document.getElementById(id).value);
-
-// ═══════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', ()=>{
-  updateDisplays();
-  drawEQ();
-
-  // Resize canvases on load and resize
-  const resize=()=>{
-    ['vizCanvas','eqCanvas'].forEach(id=>{
-      const c=document.getElementById(id);
-      if(c) c.width=c.offsetWidth;
-    });
-    drawEQ();
-  };
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Apply Naat preset by default
-  applyPreset('naat', document.querySelector('.preset-card'));
+function clearViz(){const vc=document.getElementById('vizCvs');if(vc){const g=vc.getContext('2d');g.fillStyle='#0a0a12';g.fillRect(0,0,vc.width,vc.height);}}
+window.addEventListener('DOMContentLoaded',()=>{
+  const rsz=()=>{['vizCvs','eqCvs'].forEach(id=>{const c=document.getElementById(id);if(c)c.width=c.offsetWidth;});drawEQ();};
+  rsz();window.addEventListener('resize',rsz);refreshDisplays();preset('naat',document.querySelector('.pc'));
 });
 </script>
 </body>
