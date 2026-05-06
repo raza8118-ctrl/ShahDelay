@@ -3,1205 +3,1142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VocalFX Pro — Live Vocal Processor</title>
+<title>Naat Studio — Live Vocal Processor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#08080f;
-  --s1:#0f0f1a;
-  --s2:#161625;
-  --s3:#1e1e30;
-  --border:#2c2c44;
-  --border2:#3a3a58;
-  --text:#dde0f0;
-  --text2:#7a7da0;
-  --text3:#4a4d70;
-  --accent:#00e5b4;
-  --accent2:#7c6dfa;
-  --orange:#ff7043;
-  --amber:#ffb347;
-  --red:#ff4466;
-  --green:#22ee88;
-  --blue:#4da6ff;
-  --pink:#ff4499;
+  --bg:#0a0805;
+  --s1:#100e08;
+  --s2:#181410;
+  --s3:#201c16;
+  --border:#3a3020;
+  --border2:#524535;
+  --gold:#c9952a;
+  --gold2:#e8b84b;
+  --gold3:#f5d07a;
+  --goldl:rgba(201,149,42,0.15);
+  --text:#f0e8d5;
+  --text2:#9a8a6a;
+  --text3:#5a4a30;
+  --green:#4cdf7a;
+  --red:#ff4444;
+  --blue:#4ab8ff;
+  --teal:#2de8c8;
 }
-body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
-.scanline{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Rajdhani',sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(201,149,42,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(201,149,42,0.04) 0%, transparent 60%);
+}
+
+/* GEOMETRIC PATTERN BG */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;opacity:0.03;
+  background-image:
+    linear-gradient(45deg,var(--gold) 1px,transparent 1px),
+    linear-gradient(-45deg,var(--gold) 1px,transparent 1px);
+  background-size:40px 40px;
+  z-index:0;
+}
 
 /* HEADER */
 header{
-  background:var(--s1);
-  border-bottom:1px solid var(--border);
-  padding:14px 24px;
-  display:flex;align-items:center;gap:20px;
   position:sticky;top:0;z-index:100;
-}
-.logo{font-size:22px;font-weight:700;letter-spacing:3px;color:var(--accent);text-shadow:0 0 20px rgba(0,229,180,0.4)}
-.logo span{color:var(--accent2)}
-.status-dot{width:10px;height:10px;border-radius:50%;background:var(--text3);transition:all 0.3s;flex-shrink:0}
-.status-dot.active{background:var(--green);box-shadow:0 0 10px rgba(34,238,136,0.6);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-.status-text{font-size:12px;color:var(--text2);letter-spacing:1px}
-.latency-box{margin-left:auto;font-size:12px;color:var(--text2);background:var(--s2);padding:6px 14px;border:1px solid var(--border);border-radius:4px;letter-spacing:1px}
-.latency-box span{color:var(--green);font-weight:700}
-.btn-start{
-  padding:10px 24px;border:1px solid var(--accent);background:transparent;color:var(--accent);
-  font-family:inherit;font-size:13px;letter-spacing:2px;border-radius:4px;cursor:pointer;
-  transition:all 0.2s;
-}
-.btn-start:hover{background:var(--accent);color:#000}
-.btn-start.running{border-color:var(--red);color:var(--red)}
-.btn-start.running:hover{background:var(--red);color:#fff}
-
-/* MAIN LAYOUT */
-main{padding:20px;max-width:1400px;margin:0 auto;display:grid;gap:16px}
-
-/* VU METER ROW */
-.vu-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-
-/* EFFECTS GRID */
-.fx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:900px){.fx-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.fx-grid{grid-template-columns:1fr}.vu-row{grid-template-columns:1fr}}
-
-/* MODULE */
-.module{
-  background:var(--s1);
-  border:1px solid var(--border);
-  border-radius:8px;
-  overflow:hidden;
-}
-.module-header{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 16px;
-  background:var(--s2);
+  background:rgba(10,8,5,0.95);
+  backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;align-items:center;height:64px;gap:20px;
 }
-.module-title{font-size:11px;letter-spacing:3px;font-weight:700;text-transform:uppercase}
-.module-body{padding:16px;display:flex;flex-direction:column;gap:12px}
-
-/* BYPASS TOGGLE */
-.bypass-toggle{margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer}
-.toggle-track{width:36px;height:18px;border-radius:9px;background:var(--border2);border:1px solid var(--border);position:relative;transition:all 0.2s}
-.toggle-track.on{background:rgba(0,229,180,0.3);border-color:var(--accent)}
-.toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text3);transition:all 0.2s}
-.toggle-track.on .toggle-thumb{left:20px;background:var(--accent)}
-.bypass-label{font-size:10px;color:var(--text2);letter-spacing:1px}
-
-/* COLOR ACCENTS */
-.mod-comp .module-header{border-left:3px solid var(--amber)}
-.mod-eq .module-header{border-left:3px solid var(--blue)}
-.mod-delay .module-header{border-left:3px solid var(--accent)}
-.mod-ping .module-header{border-left:3px solid var(--pink)}
-.mod-reverb .module-header{border-left:3px solid var(--accent2)}
-.mod-chorus .module-header{border-left:3px solid var(--orange)}
-.mod-io .module-header{border-left:3px solid var(--green)}
-
-/* KNOB ROW */
-.knob-row{display:flex;gap:16px;flex-wrap:wrap}
-.knob-group{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:60px}
-.knob-label{font-size:10px;color:var(--text2);letter-spacing:1px;text-align:center}
-.knob-value{font-size:12px;color:var(--text);font-weight:700;min-width:40px;text-align:center}
-
-/* CANVAS KNOB */
-canvas.knob{cursor:pointer;display:block}
-
-/* SLIDER FALLBACK */
-.slider-group{display:flex;flex-direction:column;gap:4px}
-.slider-label{font-size:10px;color:var(--text2);letter-spacing:1px;display:flex;justify-content:space-between}
-.slider-label span{color:var(--text);font-weight:700}
-input[type=range]{
-  width:100%;height:4px;appearance:none;-webkit-appearance:none;
-  background:var(--s3);border-radius:2px;outline:none;cursor:pointer;
+.logo{
+  font-family:'Cinzel',serif;
+  font-size:20px;font-weight:700;
+  color:var(--gold2);
+  letter-spacing:4px;
+  text-shadow:0 0 30px rgba(232,184,75,0.4);
+  white-space:nowrap;
 }
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-  background:var(--accent);border:2px solid var(--s1);
-  box-shadow:0 0 6px rgba(0,229,180,0.4);
+.logo span{color:var(--text2);font-weight:400;font-size:13px;display:block;letter-spacing:6px;margin-top:-4px}
+.divider{width:1px;height:30px;background:var(--border2);flex-shrink:0}
+.status-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--s2);border:1px solid var(--border);
+  padding:6px 14px;border-radius:20px;
 }
-input[type=range].amber::-webkit-slider-thumb{background:var(--amber);box-shadow:0 0 6px rgba(255,179,71,0.4)}
-input[type=range].blue::-webkit-slider-thumb{background:var(--blue);box-shadow:0 0 6px rgba(77,166,255,0.4)}
-input[type=range].pink::-webkit-slider-thumb{background:var(--pink);box-shadow:0 0 6px rgba(255,68,153,0.4)}
-input[type=range].purple::-webkit-slider-thumb{background:var(--accent2);box-shadow:0 0 6px rgba(124,109,250,0.4)}
-input[type=range].orange::-webkit-slider-thumb{background:var(--orange);box-shadow:0 0 6px rgba(255,112,67,0.4)}
-input[type=range].red::-webkit-slider-thumb{background:var(--red);box-shadow:0 0 6px rgba(255,68,102,0.4)}
-
-/* VU METER */
-.vu-canvas{width:100%;display:block;border-radius:4px}
-
-/* WAVEFORM */
-.wave-canvas{width:100%;display:block}
-
-/* TAGS */
-.tag{font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:1px;font-weight:700}
-.tag-comp{background:rgba(255,179,71,0.15);color:var(--amber);border:1px solid rgba(255,179,71,0.3)}
-.tag-eq{background:rgba(77,166,255,0.15);color:var(--blue);border:1px solid rgba(77,166,255,0.3)}
-.tag-delay{background:rgba(0,229,180,0.15);color:var(--accent);border:1px solid rgba(0,229,180,0.3)}
-.tag-ping{background:rgba(255,68,153,0.15);color:var(--pink);border:1px solid rgba(255,68,153,0.3)}
-.tag-rev{background:rgba(124,109,250,0.15);color:var(--accent2);border:1px solid rgba(124,109,250,0.3)}
-.tag-cho{background:rgba(255,112,67,0.15);color:var(--orange);border:1px solid rgba(255,112,67,0.3)}
-
-/* EQ curve canvas */
-.eq-curve{width:100%;border-radius:4px;background:var(--s2);border:1px solid var(--border)}
-
-/* Preset row */
-.preset-row{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px 20px}
-.preset-btn{
-  padding:6px 14px;border:1px solid var(--border2);background:transparent;
-  color:var(--text2);font-family:inherit;font-size:11px;letter-spacing:1px;
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all 0.3s;flex-shrink:0}
+.dot.live{background:var(--green);box-shadow:0 0 8px rgba(76,223,122,0.8);animation:blink 1.5s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.5}}
+.status-text{font-size:12px;color:var(--text2);letter-spacing:2px;font-weight:500}
+.lat-box{
+  font-size:11px;color:var(--text2);letter-spacing:1px;
+  background:var(--s2);border:1px solid var(--border);
+  padding:6px 14px;border-radius:4px;
+}
+.lat-box b{color:var(--teal);font-size:14px}
+.btn-main{
+  margin-left:auto;
+  padding:0 28px;height:40px;
+  border:1px solid var(--gold);
+  background:linear-gradient(135deg,rgba(201,149,42,0.2),rgba(201,149,42,0.05));
+  color:var(--gold2);
+  font-family:'Rajdhani',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:3px;
   border-radius:4px;cursor:pointer;transition:all 0.2s;
 }
-.preset-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.preset-btn.active{background:rgba(124,109,250,0.15);border-color:var(--accent2);color:var(--accent2)}
-.preset-label{font-size:11px;color:var(--text2);letter-spacing:2px;padding:0 20px;display:flex;align-items:center;margin-bottom:8px}
+.btn-main:hover{background:rgba(201,149,42,0.25);box-shadow:0 0 20px rgba(201,149,42,0.2)}
+.btn-main.live{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.1)}
+.btn-main.live:hover{background:rgba(255,68,68,0.2)}
 
-/* Bottom bar */
-footer{
-  background:var(--s1);border-top:1px solid var(--border);
-  padding:10px 24px;font-size:11px;color:var(--text3);letter-spacing:1px;
-  text-align:center;
-}
+/* MAIN */
+main{position:relative;z-index:1;padding:24px;max-width:1300px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 
 /* WARN */
 .warn{
-  background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);
-  color:var(--red);padding:12px 16px;border-radius:6px;font-size:13px;
-  text-align:center;display:none;
+  background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.3);
+  color:var(--red);padding:14px 20px;border-radius:6px;
+  font-size:14px;letter-spacing:1px;display:none;text-align:center;
+}
+
+/* SECTION TITLE */
+.sec-title{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:6px;
+  color:var(--gold);opacity:0.7;margin-bottom:12px;display:flex;align-items:center;gap:12px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* PRESET ROW */
+.preset-row{display:flex;gap:10px;flex-wrap:wrap}
+.preset-card{
+  flex:1;min-width:130px;
+  padding:12px 16px;
+  border:1px solid var(--border);
+  background:var(--s1);
+  border-radius:6px;cursor:pointer;
+  transition:all 0.2s;text-align:center;
+}
+.preset-card:hover{border-color:var(--border2);background:var(--s2)}
+.preset-card.active{border-color:var(--gold);background:var(--goldl);box-shadow:0 0 20px rgba(201,149,42,0.15)}
+.preset-card .pname{font-family:'Cinzel',serif;font-size:12px;color:var(--gold2);letter-spacing:2px;font-weight:600}
+.preset-card .pdesc{font-size:11px;color:var(--text2);margin-top:3px;letter-spacing:0.5px}
+.preset-card.active .pname{text-shadow:0 0 10px rgba(232,184,75,0.5)}
+
+/* TOP ROW: VIZ + IO */
+.top-row{display:grid;grid-template-columns:1fr 320px;gap:20px}
+@media(max-width:800px){.top-row{grid-template-columns:1fr}}
+
+/* PANELS */
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.panel-head{
+  padding:12px 18px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.panel-title{font-size:11px;letter-spacing:3px;font-weight:600;color:var(--text2);text-transform:uppercase}
+.panel-body{padding:18px}
+
+/* GOLD BAR accent */
+.gold-bar{width:3px;height:16px;border-radius:2px;flex-shrink:0}
+
+/* VIZ CANVAS */
+#vizCanvas{width:100%;display:block;border-radius:4px}
+
+/* VU METERS */
+.vu-wrap{display:flex;gap:8px;align-items:flex-end;height:80px;padding:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px}
+.vu-bar-wrap{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.vu-label{font-size:9px;color:var(--text3);letter-spacing:1px;text-align:center;margin-bottom:4px}
+.vu-bar{width:100%;border-radius:2px 2px 0 0;transition:height 0.05s;background:linear-gradient(to top,var(--green),#aaff44,#ffdd00,var(--red));min-height:2px}
+
+/* SLIDER CONTROL */
+.ctrl{display:flex;flex-direction:column;gap:6px}
+.ctrl-head{display:flex;justify-content:space-between;align-items:center}
+.ctrl-label{font-size:11px;color:var(--text2);letter-spacing:2px;font-weight:500}
+.ctrl-val{font-size:13px;color:var(--gold2);font-weight:600;min-width:60px;text-align:right}
+input[type=range]{
+  width:100%;height:3px;appearance:none;-webkit-appearance:none;
+  border-radius:2px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--gold) var(--pct,50%),var(--s3) var(--pct,50%));
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--gold2);border:2px solid var(--bg);
+  box-shadow:0 0 10px rgba(232,184,75,0.5);
+  transition:box-shadow 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 16px rgba(232,184,75,0.8)}
+input[type=range].blue::-webkit-slider-thumb{background:var(--blue);box-shadow:0 0 10px rgba(74,184,255,0.5)}
+input[type=range].blue{background:linear-gradient(90deg,var(--blue) var(--pct,50%),var(--s3) var(--pct,50%))}
+input[type=range].teal::-webkit-slider-thumb{background:var(--teal);box-shadow:0 0 10px rgba(45,232,200,0.4)}
+input[type=range].teal{background:linear-gradient(90deg,var(--teal) var(--pct,50%),var(--s3) var(--pct,50%))}
+input[type=range].red::-webkit-slider-thumb{background:var(--red);box-shadow:0 0 10px rgba(255,68,68,0.4)}
+input[type=range].red{background:linear-gradient(90deg,var(--red) var(--pct,50%),var(--s3) var(--pct,50%))}
+
+/* EFFECTS GRID */
+.fx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:960px){.fx-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:580px){.fx-grid{grid-template-columns:1fr}}
+
+/* FX MODULE */
+.fx-mod{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.fx-head{
+  padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.fx-title{font-size:11px;letter-spacing:3px;font-weight:600;text-transform:uppercase}
+.fx-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+
+/* ON/OFF TOGGLE */
+.toggle{margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.tog-track{
+  width:38px;height:20px;border-radius:10px;
+  background:var(--s3);border:1px solid var(--border);
+  position:relative;transition:all 0.25s;flex-shrink:0;
+}
+.tog-track.on{background:rgba(201,149,42,0.25);border-color:var(--gold)}
+.tog-thumb{
+  position:absolute;top:2px;left:2px;width:14px;height:14px;
+  border-radius:50%;background:var(--text3);transition:all 0.25s;
+}
+.tog-track.on .tog-thumb{left:20px;background:var(--gold2);box-shadow:0 0 8px rgba(232,184,75,0.6)}
+.tog-label{font-size:10px;color:var(--text3);letter-spacing:1px;transition:color 0.2s}
+.tog-track.on + .tog-label,
+.toggle:has(.on) .tog-label{color:var(--gold)}
+
+/* TAP TEMPO */
+.tap-row{display:flex;gap:8px;margin-top:4px}
+.tap-btn{
+  padding:8px 14px;background:transparent;border:1px solid var(--border2);
+  color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;
+  border-radius:4px;cursor:pointer;transition:all 0.15s;flex:1;
+}
+.tap-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tap-btn:active{background:var(--goldl);transform:scale(0.97)}
+.tap-display{
+  flex:1;background:var(--s2);border:1px solid var(--border);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;letter-spacing:2px;color:var(--gold2);
+}
+
+/* EQ curve */
+#eqCanvas{width:100%;border-radius:4px;display:block;background:var(--s2);border:1px solid var(--border)}
+
+/* IO PANEL */
+.io-panel{display:flex;flex-direction:column;gap:14px}
+
+/* BIG STATUS */
+.live-badge{
+  padding:10px;border-radius:6px;text-align:center;
+  background:rgba(76,223,122,0.1);border:1px solid rgba(76,223,122,0.3);
+  font-size:11px;letter-spacing:3px;color:var(--green);font-weight:600;
+  display:none;
+}
+.live-badge.show{display:block}
+
+/* NAAT highlight */
+.naat-glow{box-shadow:0 0 30px rgba(201,149,42,0.2),inset 0 0 30px rgba(201,149,42,0.03)}
+
+/* Reverb type buttons */
+.type-row{display:flex;gap:6px;flex-wrap:wrap}
+.type-btn{
+  padding:5px 12px;border:1px solid var(--border);background:transparent;
+  color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;
+  border-radius:3px;cursor:pointer;transition:all 0.15s;
+}
+.type-btn:hover{border-color:var(--border2);color:var(--text)}
+.type-btn.active{border-color:var(--gold);color:var(--gold2);background:var(--goldl)}
+
+/* Footer */
+footer{
+  text-align:center;padding:20px;font-size:11px;color:var(--text3);
+  letter-spacing:2px;position:relative;z-index:1;
+  border-top:1px solid var(--border);margin-top:8px;
 }
 </style>
 </head>
 <body>
-<div class="scanline"></div>
 
 <header>
-  <div class="logo">VOCAL<span>FX</span> PRO</div>
-  <div class="status-dot" id="statusDot"></div>
-  <div class="status-text" id="statusText">OFFLINE — CLICK START</div>
-  <div class="latency-box">LATENCY&nbsp;&nbsp;<span id="latencyVal">—</span>&nbsp;ms</div>
-  <button class="btn-start" id="btnStart" onclick="toggleProcessor()">▶ START</button>
+  <div class="logo">
+    نعت اسٹوڈیو
+    <span>NAAT STUDIO PRO</span>
+  </div>
+  <div class="divider"></div>
+  <div class="status-pill">
+    <div class="dot" id="dot"></div>
+    <div class="status-text" id="statusText">READY</div>
+  </div>
+  <div class="lat-box">LATENCY &nbsp;<b id="latVal">—</b> ms</div>
+  <div class="live-badge" id="liveBadge">⬤ LIVE</div>
+  <button class="btn-main" id="btnStart" onclick="toggle()">▶ &nbsp;START</button>
 </header>
 
 <main>
-  <div class="warn" id="warn">⚠ Microphone access denied. Please allow microphone permissions and reload.</div>
+  <div class="warn" id="warn">⚠ Microphone access denied. Allow mic permissions and reload the page.</div>
 
-  <!-- I/O & Visualizer Row -->
-  <div class="vu-row">
-    <!-- Input/Output Module -->
-    <div class="module mod-io">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--green)">I/O CONTROL</div>
-        <span class="tag" style="background:rgba(34,238,136,0.15);color:var(--green);border:1px solid rgba(34,238,136,0.3)">MASTER</span>
+  <!-- PRESETS -->
+  <div>
+    <div class="sec-title">PRESETS</div>
+    <div class="preset-row">
+      <div class="preset-card active" onclick="applyPreset('naat',this)">
+        <div class="pname">NAAT MEHFIL</div>
+        <div class="pdesc">Classic Pakistani echo sound</div>
       </div>
-      <div class="module-body">
-        <div class="slider-group">
-          <div class="slider-label">INPUT GAIN <span id="inGainVal">0.0 dB</span></div>
-          <input type="range" class="" id="inGain" min="-20" max="20" step="0.5" value="0">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">OUTPUT VOLUME <span id="outVolVal">80%</span></div>
-          <input type="range" class="" id="outVol" min="0" max="100" step="1" value="80">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">DRY / WET MIX <span id="dryWetVal">50%</span></div>
-          <input type="range" class="" id="dryWet" min="0" max="100" step="1" value="50">
-        </div>
-        <div style="display:flex;gap:10px;margin-top:4px">
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center">
-            <div style="font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:4px">INPUT</div>
-            <canvas id="vuIn" class="vu-canvas" height="10"></canvas>
-          </div>
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center">
-            <div style="font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:4px">OUTPUT</div>
-            <canvas id="vuOut" class="vu-canvas" height="10"></canvas>
-          </div>
-        </div>
+      <div class="preset-card" onclick="applyPreset('grand',this)">
+        <div class="pname">GRAND HALL</div>
+        <div class="pdesc">Large reverb, deep echo</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('studio',this)">
+        <div class="pname">STUDIO</div>
+        <div class="pdesc">Pro vocal, tight sound</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('intimate',this)">
+        <div class="pname">INTIMATE</div>
+        <div class="pdesc">Small room, warm</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('mosque',this)">
+        <div class="pname">MOSQUE</div>
+        <div class="pdesc">Long reverb, sacred space</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('dry',this)">
+        <div class="pname">DRY MONITOR</div>
+        <div class="pdesc">Zero effects — pure voice</div>
       </div>
     </div>
+  </div>
 
-    <!-- Waveform Visualizer -->
-    <div class="module">
-      <div class="module-header">
-        <div class="module-title">LIVE WAVEFORM</div>
-        <select id="vizMode" style="margin-left:auto;background:var(--s3);color:var(--text2);border:1px solid var(--border);border-radius:3px;padding:4px 8px;font-family:inherit;font-size:11px">
-          <option value="waveform">WAVEFORM</option>
-          <option value="spectrum">SPECTRUM</option>
+  <!-- TOP ROW: VIZ + IO -->
+  <div class="top-row">
+
+    <!-- WAVEFORM + VU -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="gold-bar" style="background:var(--gold)"></div>
+        <div class="panel-title">LIVE MONITOR</div>
+        <select id="vizMode" onchange="vizModeChange()" style="margin-left:auto;background:var(--s3);color:var(--text2);border:1px solid var(--border);padding:4px 10px;font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;border-radius:3px">
+          <option value="wave">WAVEFORM</option>
+          <option value="spec">SPECTRUM</option>
         </select>
       </div>
-      <div class="module-body" style="padding:12px">
-        <canvas id="vizCanvas" class="wave-canvas" height="120"></canvas>
+      <div class="panel-body" style="padding:14px">
+        <canvas id="vizCanvas" height="110"></canvas>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+          <div>
+            <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;text-align:center">INPUT LEVEL</div>
+            <div style="height:12px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
+              <div id="vuIn" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--green),#aaff00,var(--red));transition:width 0.06s"></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;text-align:center">OUTPUT LEVEL</div>
+            <div style="height:12px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
+              <div id="vuOut" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--red));transition:width 0.06s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- I/O CONTROL -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="gold-bar" style="background:var(--teal)"></div>
+        <div class="panel-title">INPUT / OUTPUT</div>
+      </div>
+      <div class="panel-body">
+        <div class="io-panel">
+          <div class="ctrl">
+            <div class="ctrl-head">
+              <div class="ctrl-label">INPUT GAIN</div>
+              <div class="ctrl-val" id="vInGain">0.0 dB</div>
+            </div>
+            <input type="range" class="teal" id="inGain" min="-12" max="18" step="0.5" value="0" oninput="sliderUpdate(this,'inGain')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head">
+              <div class="ctrl-label">MASTER VOLUME</div>
+              <div class="ctrl-val" id="vOutVol">80%</div>
+            </div>
+            <input type="range" class="teal" id="outVol" min="0" max="100" step="1" value="80" oninput="sliderUpdate(this,'outVol')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head">
+              <div class="ctrl-label">DRY / WET</div>
+              <div class="ctrl-val" id="vDryWet">40%</div>
+            </div>
+            <input type="range" class="" id="dryWet" min="0" max="100" step="1" value="40" oninput="sliderUpdate(this,'dryWet')">
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:2px;margin-bottom:10px">QUICK CONTROLS</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="tap-btn" onclick="toggleBypass('echo')" id="qEcho" style="flex:1">ECHO ON</button>
+              <button class="tap-btn" onclick="toggleBypass('reverb')" id="qReverb" style="flex:1">REVERB ON</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+              <button class="tap-btn" onclick="toggleBypass('chorus')" id="qChorus" style="flex:1">CHORUS ON</button>
+              <button class="tap-btn" onclick="toggleBypass('eq')" id="qEQ" style="flex:1">EQ ON</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Presets -->
+  <!-- FX MODULES -->
   <div>
-    <div class="preset-label">▸ PRESETS</div>
-    <div class="preset-row">
-      <button class="preset-btn active" onclick="applyPreset('clean')">CLEAN</button>
-      <button class="preset-btn" onclick="applyPreset('studio')">STUDIO VOCAL</button>
-      <button class="preset-btn" onclick="applyPreset('stadium')">STADIUM ECHO</button>
-      <button class="preset-btn" onclick="applyPreset('dreamy')">DREAMY</button>
-      <button class="preset-btn" onclick="applyPreset('vintage')">VINTAGE</button>
-      <button class="preset-btn" onclick="applyPreset('telephone')">TELEPHONE</button>
-      <button class="preset-btn" onclick="applyPreset('cave')">CAVE</button>
+    <div class="sec-title">EFFECTS CHAIN</div>
+    <div class="fx-grid">
+
+      <!-- ECHO (DELAY) — PRIMARY FOR NAAT -->
+      <div class="fx-mod naat-glow">
+        <div class="fx-head" style="border-left:3px solid var(--gold)">
+          <div class="fx-title" style="color:var(--gold2)">ECHO / DELAY</div>
+          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(201,149,42,0.15);color:var(--gold);border:1px solid rgba(201,149,42,0.3);letter-spacing:1px">NAAT</span>
+          <div class="toggle" onclick="toggleBypass('echo')">
+            <div class="tog-track on" id="tog-echo"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">ECHO TIME</div><div class="ctrl-val" id="vEchoTime">340 ms</div></div>
+            <input type="range" id="echoTime" min="30" max="900" step="5" value="340" oninput="sliderUpdate(this,'echoTime')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">REPEATS</div><div class="ctrl-val" id="vEchoFb">55%</div></div>
+            <input type="range" id="echoFb" min="0" max="85" step="1" value="55" oninput="sliderUpdate(this,'echoFb')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">ECHO TONE</div><div class="ctrl-val" id="vEchoDamp">8 kHz</div></div>
+            <input type="range" id="echoDamp" min="1000" max="20000" step="200" value="8000" oninput="sliderUpdate(this,'echoDamp')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">ECHO VOLUME</div><div class="ctrl-val" id="vEchoWet">45%</div></div>
+            <input type="range" id="echoWet" min="0" max="100" step="1" value="45" oninput="sliderUpdate(this,'echoWet')">
+          </div>
+          <div class="tap-row">
+            <button class="tap-btn" onclick="doTap('echo')">TAP TEMPO</button>
+            <div class="tap-display" id="tapEcho">— BPM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PING PONG DELAY -->
+      <div class="fx-mod">
+        <div class="fx-head" style="border-left:3px solid var(--blue)">
+          <div class="fx-title" style="color:var(--blue)">PING-PONG</div>
+          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(74,184,255,0.1);color:var(--blue);border:1px solid rgba(74,184,255,0.3);letter-spacing:1px">STEREO</span>
+          <div class="toggle" onclick="toggleBypass('ping')">
+            <div class="tog-track on" id="tog-ping"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">DELAY TIME</div><div class="ctrl-val" id="vPingTime">480 ms</div></div>
+            <input type="range" class="blue" id="pingTime" min="30" max="800" step="5" value="480" oninput="sliderUpdate(this,'pingTime')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">FEEDBACK</div><div class="ctrl-val" id="vPingFb">45%</div></div>
+            <input type="range" class="blue" id="pingFb" min="0" max="85" step="1" value="45" oninput="sliderUpdate(this,'pingFb')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">STEREO WIDTH</div><div class="ctrl-val" id="vPingWidth">100%</div></div>
+            <input type="range" class="blue" id="pingWidth" min="0" max="100" step="1" value="100" oninput="sliderUpdate(this,'pingWidth')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vPingWet">25%</div></div>
+            <input type="range" class="blue" id="pingWet" min="0" max="100" step="1" value="25" oninput="sliderUpdate(this,'pingWet')">
+          </div>
+          <div class="tap-row">
+            <button class="tap-btn" onclick="doTap('ping')">TAP TEMPO</button>
+            <div class="tap-display" id="tapPing" style="color:var(--blue)">— BPM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVERB -->
+      <div class="fx-mod">
+        <div class="fx-head" style="border-left:3px solid var(--teal)">
+          <div class="fx-title" style="color:var(--teal)">REVERB</div>
+          <div class="toggle" onclick="toggleBypass('reverb')">
+            <div class="tog-track on" id="tog-reverb"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <div class="type-row">
+            <button class="type-btn active" onclick="setRevType('room',this)">ROOM</button>
+            <button class="type-btn" onclick="setRevType('hall',this)">HALL</button>
+            <button class="type-btn" onclick="setRevType('plate',this)">PLATE</button>
+            <button class="type-btn" onclick="setRevType('mosque',this)">MOSQUE</button>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">ROOM SIZE</div><div class="ctrl-val" id="vRevSize">60%</div></div>
+            <input type="range" class="teal" id="revSize" min="5" max="100" step="1" value="60" oninput="sliderUpdate(this,'revSize')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">DECAY</div><div class="ctrl-val" id="vRevDecay">2.5 s</div></div>
+            <input type="range" class="teal" id="revDecay" min="0.3" max="9" step="0.1" value="2.5" oninput="sliderUpdate(this,'revDecay')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">PRE-DELAY</div><div class="ctrl-val" id="vRevPre">15 ms</div></div>
+            <input type="range" class="teal" id="revPre" min="0" max="80" step="1" value="15" oninput="sliderUpdate(this,'revPre')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vRevWet">30%</div></div>
+            <input type="range" class="teal" id="revWet" min="0" max="100" step="1" value="30" oninput="sliderUpdate(this,'revWet')">
+          </div>
+        </div>
+      </div>
+
+      <!-- EQ -->
+      <div class="fx-mod">
+        <div class="fx-head" style="border-left:3px solid #ff9f43">
+          <div class="fx-title" style="color:#ff9f43">3-BAND EQ</div>
+          <div class="toggle" onclick="toggleBypass('eq')">
+            <div class="tog-track on" id="tog-eq"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <canvas id="eqCanvas" height="70"></canvas>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">LOW GAIN</div><div class="ctrl-val" id="vEqLow">0 dB</div></div>
+            <input type="range" id="eqLow" min="-18" max="18" step="0.5" value="0" oninput="sliderUpdate(this,'eqLow')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">MID GAIN <span style="font-size:10px;color:var(--text3)">(1-4kHz)</span></div><div class="ctrl-val" id="vEqMid">+2 dB</div></div>
+            <input type="range" id="eqMid" min="-18" max="18" step="0.5" value="2" oninput="sliderUpdate(this,'eqMid')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">HIGH GAIN <span style="font-size:10px;color:var(--text3)">(AIR)</span></div><div class="ctrl-val" id="vEqHigh">+3 dB</div></div>
+            <input type="range" id="eqHigh" min="-18" max="18" step="0.5" value="3" oninput="sliderUpdate(this,'eqHigh')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">PRESENCE FREQ</div><div class="ctrl-val" id="vEqMidF">2.5 kHz</div></div>
+            <input type="range" id="eqMidF" min="500" max="8000" step="100" value="2500" oninput="sliderUpdate(this,'eqMidF')" style="background:linear-gradient(90deg,#ff9f43 var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+        </div>
+      </div>
+
+      <!-- CHORUS -->
+      <div class="fx-mod">
+        <div class="fx-head" style="border-left:3px solid #c44dff">
+          <div class="fx-title" style="color:#c44dff">CHORUS</div>
+          <div class="toggle" onclick="toggleBypass('chorus')">
+            <div class="tog-track on" id="tog-chorus"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">RATE</div><div class="ctrl-val" id="vChorRate">0.8 Hz</div></div>
+            <input type="range" id="chorRate" min="0.1" max="8" step="0.1" value="0.8" oninput="sliderUpdate(this,'chorRate')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">DEPTH</div><div class="ctrl-val" id="vChorDepth">8 ms</div></div>
+            <input type="range" id="chorDepth" min="1" max="25" step="0.5" value="8" oninput="sliderUpdate(this,'chorDepth')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">SPREAD</div><div class="ctrl-val" id="vChorSpread">80%</div></div>
+            <input type="range" id="chorSpread" min="0" max="100" step="1" value="80" oninput="sliderUpdate(this,'chorSpread')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">WET MIX</div><div class="ctrl-val" id="vChorWet">20%</div></div>
+            <input type="range" id="chorWet" min="0" max="100" step="1" value="20" oninput="sliderUpdate(this,'chorWet')" style="background:linear-gradient(90deg,#c44dff var(--pct,50%),var(--s3) var(--pct,50%))">
+          </div>
+        </div>
+      </div>
+
+      <!-- LIMITER (soft, not compressor — prevents breaking) -->
+      <div class="fx-mod">
+        <div class="fx-head" style="border-left:3px solid var(--red)">
+          <div class="fx-title" style="color:var(--red)">SOFT LIMITER</div>
+          <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.3);letter-spacing:1px">PROTECT</span>
+          <div class="toggle" onclick="toggleBypass('limiter')">
+            <div class="tog-track on" id="tog-limiter"><div class="tog-thumb"></div></div>
+            <span class="tog-label">ON</span>
+          </div>
+        </div>
+        <div class="fx-body">
+          <div style="font-size:11px;color:var(--text2);letter-spacing:1px;line-height:1.6;padding:8px;background:var(--s2);border-radius:4px;border:1px solid var(--border)">
+            Soft limiter gently prevents your voice from clipping or breaking. Keep threshold high (-6 to -3 dB) so it only catches peaks — not your whole voice.
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">THRESHOLD</div><div class="ctrl-val" id="vLimThresh">-6 dB</div></div>
+            <input type="range" class="red" id="limThresh" min="-30" max="-1" step="0.5" value="-6" oninput="sliderUpdate(this,'limThresh')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">RELEASE</div><div class="ctrl-val" id="vLimRelease">80 ms</div></div>
+            <input type="range" class="red" id="limRelease" min="10" max="500" step="5" value="80" oninput="sliderUpdate(this,'limRelease')">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-head"><div class="ctrl-label">MAKEUP GAIN</div><div class="ctrl-val" id="vLimMakeup">+2 dB</div></div>
+            <input type="range" class="red" id="limMakeup" min="-6" max="12" step="0.5" value="2" oninput="sliderUpdate(this,'limMakeup')">
+          </div>
+          <div id="gainReductionBar" style="height:6px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden">
+            <div id="grBar" style="height:100%;width:0%;background:var(--red);transition:width 0.08s;border-radius:3px"></div>
+          </div>
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-align:center">GAIN REDUCTION</div>
+        </div>
+      </div>
+
     </div>
-  </div>
-
-  <!-- FX Grid -->
-  <div class="fx-grid">
-
-    <!-- COMPRESSOR -->
-    <div class="module mod-comp">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--amber)">COMPRESSOR</div>
-        <span class="tag tag-comp">DYN</span>
-        <div class="bypass-toggle" onclick="toggleBypass('comp')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-comp"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <div class="slider-group">
-          <div class="slider-label">THRESHOLD <span id="compThreshVal">-20 dB</span></div>
-          <input type="range" class="amber" id="compThresh" min="-60" max="0" step="1" value="-20">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">RATIO <span id="compRatioVal">4:1</span></div>
-          <input type="range" class="amber" id="compRatio" min="1" max="20" step="0.5" value="4">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">ATTACK <span id="compAttackVal">10 ms</span></div>
-          <input type="range" class="amber" id="compAttack" min="0" max="200" step="1" value="10">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">RELEASE <span id="compReleaseVal">100 ms</span></div>
-          <input type="range" class="amber" id="compRelease" min="10" max="1000" step="10" value="100">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">KNEE <span id="compKneeVal">10 dB</span></div>
-          <input type="range" class="amber" id="compKnee" min="0" max="40" step="1" value="10">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">MAKEUP GAIN <span id="compMakeupVal">0 dB</span></div>
-          <input type="range" class="amber" id="compMakeup" min="-10" max="30" step="0.5" value="0">
-        </div>
-      </div>
-    </div>
-
-    <!-- 3-BAND EQ -->
-    <div class="module mod-eq">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--blue)">3-BAND EQ</div>
-        <span class="tag tag-eq">EQ</span>
-        <div class="bypass-toggle" onclick="toggleBypass('eq')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-eq"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <canvas id="eqCurve" class="eq-curve" height="80"></canvas>
-        <div class="slider-group">
-          <div class="slider-label">LOW FREQ <span id="eqLowFVal">100 Hz</span></div>
-          <input type="range" class="blue" id="eqLowF" min="20" max="500" step="5" value="100">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">LOW GAIN <span id="eqLowGVal">0 dB</span></div>
-          <input type="range" class="blue" id="eqLowG" min="-18" max="18" step="0.5" value="0">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">MID FREQ <span id="eqMidFVal">1000 Hz</span></div>
-          <input type="range" class="blue" id="eqMidF" min="200" max="8000" step="50" value="1000">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">MID GAIN <span id="eqMidGVal">0 dB</span></div>
-          <input type="range" class="blue" id="eqMidG" min="-18" max="18" step="0.5" value="0">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">MID Q <span id="eqMidQVal">1.0</span></div>
-          <input type="range" class="blue" id="eqMidQ" min="0.1" max="10" step="0.1" value="1">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">HIGH FREQ <span id="eqHiFVal">8000 Hz</span></div>
-          <input type="range" class="blue" id="eqHiF" min="2000" max="20000" step="200" value="8000">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">HIGH GAIN <span id="eqHiGVal">0 dB</span></div>
-          <input type="range" class="blue" id="eqHiG" min="-18" max="18" step="0.5" value="0">
-        </div>
-      </div>
-    </div>
-
-    <!-- DIGITAL DELAY -->
-    <div class="module mod-delay">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--accent)">DIGITAL DELAY</div>
-        <span class="tag tag-delay">DDL</span>
-        <div class="bypass-toggle" onclick="toggleBypass('delay')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-delay"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <div class="slider-group">
-          <div class="slider-label">DELAY TIME <span id="delayTimeVal">250 ms</span></div>
-          <input type="range" class="" id="delayTime" min="10" max="1000" step="5" value="250">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">FEEDBACK <span id="delayFbVal">40%</span></div>
-          <input type="range" class="" id="delayFb" min="0" max="95" step="1" value="40">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">DAMPING <span id="delayDampVal">4000 Hz</span></div>
-          <input type="range" class="" id="delayDamp" min="500" max="20000" step="100" value="4000">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">WET MIX <span id="delayWetVal">30%</span></div>
-          <input type="range" class="" id="delayWet" min="0" max="100" step="1" value="30">
-        </div>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="preset-btn" style="flex:1;font-size:10px" onclick="tapTempo('delay')">TAP TEMPO</button>
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:6px;text-align:center;font-size:11px;color:var(--accent)" id="tapBPM">— BPM</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PING-PONG DELAY -->
-    <div class="module mod-ping">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--pink)">PING-PONG</div>
-        <span class="tag tag-ping">P-P</span>
-        <div class="bypass-toggle" onclick="toggleBypass('ping')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-ping"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <div class="slider-group">
-          <div class="slider-label">DELAY TIME <span id="pingTimeVal">300 ms</span></div>
-          <input type="range" class="pink" id="pingTime" min="10" max="800" step="5" value="300">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">FEEDBACK <span id="pingFbVal">50%</span></div>
-          <input type="range" class="pink" id="pingFb" min="0" max="95" step="1" value="50">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">STEREO WIDTH <span id="pingWidthVal">100%</span></div>
-          <input type="range" class="pink" id="pingWidth" min="0" max="100" step="1" value="100">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">WET MIX <span id="pingWetVal">25%</span></div>
-          <input type="range" class="pink" id="pingWet" min="0" max="100" step="1" value="25">
-        </div>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="preset-btn" style="flex:1;font-size:10px" onclick="tapTempo('ping')">TAP TEMPO</button>
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:6px;text-align:center;font-size:11px;color:var(--pink)" id="tapBPM2">— BPM</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- REVERB -->
-    <div class="module mod-reverb">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--accent2)">REVERB</div>
-        <span class="tag tag-rev">REV</span>
-        <div class="bypass-toggle" onclick="toggleBypass('reverb')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-reverb"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <div class="slider-group">
-          <div class="slider-label">ROOM SIZE <span id="revSizeVal">60%</span></div>
-          <input type="range" class="purple" id="revSize" min="1" max="100" step="1" value="60">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">DECAY TIME <span id="revDecayVal">2.5 s</span></div>
-          <input type="range" class="purple" id="revDecay" min="0.2" max="8" step="0.1" value="2.5">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">PRE-DELAY <span id="revPreVal">20 ms</span></div>
-          <input type="range" class="purple" id="revPre" min="0" max="100" step="1" value="20">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">DAMPING <span id="revDampVal">6000 Hz</span></div>
-          <input type="range" class="purple" id="revDamp" min="500" max="20000" step="200" value="6000">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">WET MIX <span id="revWetVal">30%</span></div>
-          <input type="range" class="purple" id="revWet" min="0" max="100" step="1" value="30">
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-          <button class="preset-btn" style="font-size:10px" onclick="setReverbType('room')">ROOM</button>
-          <button class="preset-btn" style="font-size:10px" onclick="setReverbType('hall')">HALL</button>
-          <button class="preset-btn" style="font-size:10px" onclick="setReverbType('plate')">PLATE</button>
-          <button class="preset-btn" style="font-size:10px" onclick="setReverbType('church')">CHURCH</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CHORUS -->
-    <div class="module mod-chorus">
-      <div class="module-header">
-        <div class="module-title" style="color:var(--orange)">CHORUS / FLANGER</div>
-        <span class="tag tag-cho">CHR</span>
-        <div class="bypass-toggle" onclick="toggleBypass('chorus')">
-          <div class="bypass-label">ON</div>
-          <div class="toggle-track on" id="byp-chorus"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-      <div class="module-body">
-        <div style="display:flex;gap:8px;margin-bottom:4px">
-          <button class="preset-btn active" style="flex:1;font-size:10px" id="modeChorus" onclick="setChorusMode('chorus')">CHORUS</button>
-          <button class="preset-btn" style="flex:1;font-size:10px" id="modeFlanger" onclick="setChorusMode('flanger')">FLANGER</button>
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">RATE <span id="chorRateVal">1.0 Hz</span></div>
-          <input type="range" class="orange" id="chorRate" min="0.1" max="10" step="0.1" value="1">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">DEPTH <span id="chorDepthVal">5 ms</span></div>
-          <input type="range" class="orange" id="chorDepth" min="1" max="30" step="0.5" value="5">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">VOICES <span id="chorVoicesVal">3</span></div>
-          <input type="range" class="orange" id="chorVoices" min="1" max="4" step="1" value="3">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">FEEDBACK <span id="chorFbVal">0%</span></div>
-          <input type="range" class="orange" id="chorFb" min="0" max="90" step="1" value="0">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label">WET MIX <span id="chorWetVal">30%</span></div>
-          <input type="range" class="orange" id="chorWet" min="0" max="100" step="1" value="30">
-        </div>
-      </div>
-    </div>
-
   </div>
 </main>
 
-<footer>VOCALFX PRO — ZERO-LATENCY LIVE VOCAL PROCESSOR — BUILT ON WEB AUDIO API — USE HEADPHONES TO PREVENT FEEDBACK</footer>
+<footer>
+  NAAT STUDIO PRO — USE WIRED EARPHONES — BUILT WITH WEB AUDIO API — LOW LATENCY MODE ACTIVE
+</footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// AUDIO ENGINE
-// ═══════════════════════════════════════════════════════════
-let audioCtx = null;
-let sourceNode = null;
-let stream = null;
-let running = false;
-let analyserIn, analyserOut;
-let animFrame;
+// ═══════════════════════════════════════════════════════════════════════
+// AUDIO ENGINE — OPTIMIZED FOR MINIMUM LATENCY
+// ═══════════════════════════════════════════════════════════════════════
+let ctx = null, stream = null, running = false;
+let analyserIn = null, analyserOut = null;
+let animId = null;
 
 // Nodes
-let inGainNode, outGainNode, dryGainNode, wetGainNode;
-let compNode, compMakeupNode;
-let eqLow, eqMid, eqHigh;
-let delayNode, delayFbNode, delayWetNode, delayDampFilter;
-let pingDelayL, pingDelayR, pingFbNode, pingPanL, pingPanR, pingWetNode;
-let reverbConvolver, reverbPreDelay, reverbWetNode, reverbDampFilter;
-let chorusWetNode;
-let chorusDelays = [], chorusLFOs = [], chorusGains = [], chorusFbNodes = [];
-let bypassStates = {comp:true, eq:true, delay:true, ping:true, reverb:true, chorus:true};
+let srcNode, inGain, outGain, dryGain, wetBus;
+let limiter, limMakeupGain;
+let eqLowNode, eqMidNode, eqHighNode;
+let echoDelay, echoFb, echoDampF, echoWetGain;
+let pingL, pingR, pingFbGain, pingPanL, pingPanR, pingWetGain;
+let convolver, revPreDelay, revDampF, revWetGain;
+let chorDelays = [], chorLFOs = [], chorLFOGains = [], chorPans = [], chorWetGain;
 
-// Tap tempo
-let tapTimes = {delay:[], ping:[]};
+const bypState = {echo:true,ping:true,reverb:true,eq:true,chorus:true,limiter:true};
 
-async function toggleProcessor() {
-  if (running) {
-    stopProcessor();
-  } else {
-    await startProcessor();
-  }
+async function toggle() {
+  running ? stop() : await start();
 }
 
-async function startProcessor() {
+async function start() {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
-        sampleRate: 48000,
-        channelCount: 2
-      }
-    });
+    stream = await navigator.mediaDevices.getUserMedia({audio:{
+      echoCancellation:false,
+      noiseSuppression:false,
+      autoGainControl:false,
+      latency:0,
+      channelCount:2
+    }});
   } catch(e) {
-    document.getElementById('warn').style.display = 'block';
+    document.getElementById('warn').style.display='block';
     return;
   }
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-    latencyHint: 'interactive',
-    sampleRate: 48000
+  // Use lowest possible latency
+  ctx = new (window.AudioContext||window.webkitAudioContext)({
+    latencyHint:'interactive',
+    sampleRate:48000
   });
+  if(ctx.state==='suspended') await ctx.resume();
 
-  if (audioCtx.state === 'suspended') await audioCtx.resume();
-
-  buildChain();
+  buildAudioGraph();
   running = true;
 
-  document.getElementById('statusDot').classList.add('active');
-  document.getElementById('statusText').textContent = 'LIVE — PROCESSING';
+  document.getElementById('dot').classList.add('live');
+  document.getElementById('statusText').textContent='LIVE — PROCESSING';
+  document.getElementById('liveBadge').classList.add('show');
   const btn = document.getElementById('btnStart');
-  btn.textContent = '■ STOP';
-  btn.classList.add('running');
+  btn.textContent = '■  STOP';
+  btn.classList.add('live');
 
-  const latency = Math.round((audioCtx.baseLatency || 0.005) * 1000);
-  document.getElementById('latencyVal').textContent = latency < 5 ? '<5' : latency;
+  const ms = Math.round((ctx.baseLatency||0.005)*1000);
+  document.getElementById('latVal').textContent = ms < 8 ? '<8' : ms;
 
-  startVisualization();
+  startViz();
 }
 
-function buildChain() {
-  const ctx = audioCtx;
+function buildAudioGraph() {
+  const C = ctx;
 
-  // Source
-  sourceNode = ctx.createMediaStreamSource(stream);
+  srcNode = C.createMediaStreamSource(stream);
 
   // Analysers
-  analyserIn = ctx.createAnalyser();
-  analyserIn.fftSize = 2048;
-  analyserOut = ctx.createAnalyser();
-  analyserOut.fftSize = 2048;
+  analyserIn = C.createAnalyser(); analyserIn.fftSize=2048;
+  analyserOut = C.createAnalyser(); analyserOut.fftSize=2048;
 
   // Input gain
-  inGainNode = ctx.createGain();
-  inGainNode.gain.value = Math.pow(10, parseFloat(document.getElementById('inGain').value) / 20);
+  inGain = C.createGain();
+  inGain.gain.value = dbToLin(v('inGain'));
 
-  // Compressor
-  compNode = ctx.createDynamicsCompressor();
-  compNode.threshold.value = parseFloat(document.getElementById('compThresh').value);
-  compNode.ratio.value = parseFloat(document.getElementById('compRatio').value);
-  compNode.attack.value = parseFloat(document.getElementById('compAttack').value) / 1000;
-  compNode.release.value = parseFloat(document.getElementById('compRelease').value) / 1000;
-  compNode.knee.value = parseFloat(document.getElementById('compKnee').value);
+  // ── LIMITER (soft compressor with high ratio, fast attack, gentle knee) ──
+  limiter = C.createDynamicsCompressor();
+  limiter.threshold.value = v('limThresh');
+  limiter.ratio.value = 20; // brick-wall
+  limiter.attack.value = 0.001;
+  limiter.release.value = v('limRelease')/1000;
+  limiter.knee.value = 8;
+  limMakeupGain = C.createGain();
+  limMakeupGain.gain.value = dbToLin(v('limMakeup'));
 
-  compMakeupNode = ctx.createGain();
-  compMakeupNode.gain.value = Math.pow(10, parseFloat(document.getElementById('compMakeup').value) / 20);
+  // ── EQ ──
+  eqLowNode = C.createBiquadFilter();
+  eqLowNode.type='lowshelf'; eqLowNode.frequency.value=200; eqLowNode.gain.value=v('eqLow');
+  eqMidNode = C.createBiquadFilter();
+  eqMidNode.type='peaking'; eqMidNode.frequency.value=v('eqMidF'); eqMidNode.gain.value=v('eqMid'); eqMidNode.Q.value=1.2;
+  eqHighNode = C.createBiquadFilter();
+  eqHighNode.type='highshelf'; eqHighNode.frequency.value=8000; eqHighNode.gain.value=v('eqHigh');
 
-  // EQ
-  eqLow = ctx.createBiquadFilter();
-  eqLow.type = 'lowshelf';
-  eqLow.frequency.value = parseFloat(document.getElementById('eqLowF').value);
-  eqLow.gain.value = parseFloat(document.getElementById('eqLowG').value);
+  // ── OUTPUT ──
+  outGain = C.createGain();
+  outGain.gain.value = v('outVol')/100;
 
-  eqMid = ctx.createBiquadFilter();
-  eqMid.type = 'peaking';
-  eqMid.frequency.value = parseFloat(document.getElementById('eqMidF').value);
-  eqMid.gain.value = parseFloat(document.getElementById('eqMidG').value);
-  eqMid.Q.value = parseFloat(document.getElementById('eqMidQ').value);
+  // ── DRY / WET BUS ──
+  dryGain = C.createGain();
+  wetBus = C.createGain();
+  const dw = v('dryWet')/100;
+  dryGain.gain.value = 1-dw;
+  wetBus.gain.value = dw;
 
-  eqHigh = ctx.createBiquadFilter();
-  eqHigh.type = 'highshelf';
-  eqHigh.frequency.value = parseFloat(document.getElementById('eqHiF').value);
-  eqHigh.gain.value = parseFloat(document.getElementById('eqHiG').value);
+  // ── ECHO ──
+  const preFX = C.createGain(); // send point for all effects
+  echoDelay = C.createDelay(2.0); echoDelay.delayTime.value = v('echoTime')/1000;
+  echoFb = C.createGain(); echoFb.gain.value = v('echoFb')/100;
+  echoDampF = C.createBiquadFilter(); echoDampF.type='lowpass'; echoDampF.frequency.value=v('echoDamp');
+  echoWetGain = C.createGain(); echoWetGain.gain.value = bypState.echo ? v('echoWet')/100 : 0;
 
-  // Pre-effects split
-  const preFxNode = ctx.createGain();
-  dryGainNode = ctx.createGain();
-  dryGainNode.gain.value = 0.5;
-  wetGainNode = ctx.createGain();
-  wetGainNode.gain.value = 0.5;
+  preFX.connect(echoDelay);
+  echoDelay.connect(echoDampF);
+  echoDampF.connect(echoFb);
+  echoFb.connect(echoDelay);
+  echoDampF.connect(echoWetGain);
+  echoWetGain.connect(wetBus);
 
-  // Master output
-  outGainNode = ctx.createGain();
-  outGainNode.gain.value = parseFloat(document.getElementById('outVol').value) / 100;
+  // ── PING-PONG ──
+  pingL = C.createDelay(2.0); pingL.delayTime.value=v('pingTime')/1000;
+  pingR = C.createDelay(2.0); pingR.delayTime.value=v('pingTime')/1000*0.7;
+  pingFbGain = C.createGain(); pingFbGain.gain.value=v('pingFb')/100;
+  const pw = v('pingWidth')/100;
+  pingPanL = C.createStereoPanner(); pingPanL.pan.value=-pw;
+  pingPanR = C.createStereoPanner(); pingPanR.pan.value=pw;
+  pingWetGain = C.createGain(); pingWetGain.gain.value=bypState.ping?v('pingWet')/100:0;
 
-  // ─── DIGITAL DELAY ───
-  delayNode = ctx.createDelay(2.0);
-  delayNode.delayTime.value = parseFloat(document.getElementById('delayTime').value) / 1000;
-  delayFbNode = ctx.createGain();
-  delayFbNode.gain.value = parseFloat(document.getElementById('delayFb').value) / 100;
-  delayDampFilter = ctx.createBiquadFilter();
-  delayDampFilter.type = 'lowpass';
-  delayDampFilter.frequency.value = parseFloat(document.getElementById('delayDamp').value);
-  delayWetNode = ctx.createGain();
-  delayWetNode.gain.value = parseFloat(document.getElementById('delayWet').value) / 100;
+  preFX.connect(pingL);
+  pingL.connect(pingPanL); pingPanL.connect(pingWetGain);
+  pingL.connect(pingFbGain); pingFbGain.connect(pingR);
+  pingR.connect(pingPanR); pingPanR.connect(pingWetGain);
+  pingR.connect(pingFbGain);
+  pingWetGain.connect(wetBus);
 
-  // Delay feedback loop: preFx → delay → damp → fb → delay
-  preFxNode.connect(delayNode);
-  delayNode.connect(delayDampFilter);
-  delayDampFilter.connect(delayFbNode);
-  delayFbNode.connect(delayNode);
-  delayDampFilter.connect(delayWetNode);
+  // ── REVERB ──
+  convolver = C.createConvolver();
+  revPreDelay = C.createDelay(0.3); revPreDelay.delayTime.value=v('revPre')/1000;
+  revDampF = C.createBiquadFilter(); revDampF.type='lowpass'; revDampF.frequency.value=7000;
+  revWetGain = C.createGain(); revWetGain.gain.value=bypState.reverb?v('revWet')/100:0;
+  buildIR();
 
-  // ─── PING-PONG DELAY ───
-  pingDelayL = ctx.createDelay(2.0);
-  pingDelayR = ctx.createDelay(2.0);
-  pingDelayL.delayTime.value = parseFloat(document.getElementById('pingTime').value) / 1000;
-  pingDelayR.delayTime.value = parseFloat(document.getElementById('pingTime').value) / 1000 * 0.75;
-  pingFbNode = ctx.createGain();
-  pingFbNode.gain.value = parseFloat(document.getElementById('pingFb').value) / 100;
-  pingPanL = ctx.createStereoPanner();
-  pingPanR = ctx.createStereoPanner();
-  const w = parseFloat(document.getElementById('pingWidth').value) / 100;
-  pingPanL.pan.value = -w;
-  pingPanR.pan.value = w;
-  pingWetNode = ctx.createGain();
-  pingWetNode.gain.value = parseFloat(document.getElementById('pingWet').value) / 100;
+  preFX.connect(revPreDelay);
+  revPreDelay.connect(convolver);
+  convolver.connect(revDampF);
+  revDampF.connect(revWetGain);
+  revWetGain.connect(wetBus);
 
-  // Ping-pong: input → L delay → pan L → wet; L delay → fb → R delay → pan R → wet; R → fb → L
-  preFxNode.connect(pingDelayL);
-  pingDelayL.connect(pingPanL);
-  pingPanL.connect(pingWetNode);
-  pingDelayL.connect(pingFbNode);
-  pingFbNode.connect(pingDelayR);
-  pingDelayR.connect(pingPanR);
-  pingPanR.connect(pingWetNode);
-  pingDelayR.connect(pingFbNode);
+  // ── CHORUS ──
+  buildChorus(preFX);
 
-  // ─── REVERB ───
-  reverbConvolver = ctx.createConvolver();
-  reverbPreDelay = ctx.createDelay(0.5);
-  reverbPreDelay.delayTime.value = parseFloat(document.getElementById('revPre').value) / 1000;
-  reverbDampFilter = ctx.createBiquadFilter();
-  reverbDampFilter.type = 'lowpass';
-  reverbDampFilter.frequency.value = parseFloat(document.getElementById('revDamp').value);
-  reverbWetNode = ctx.createGain();
-  reverbWetNode.gain.value = parseFloat(document.getElementById('revWet').value) / 100;
+  // ── MASTER CHAIN ──
+  // Mic → analyserIn → inGain → limiter → makeupGain → EQ chain → preFX + dryGain
+  srcNode.connect(analyserIn);
+  analyserIn.connect(inGain);
+  inGain.connect(limiter);
+  limiter.connect(limMakeupGain);
+  limMakeupGain.connect(eqLowNode);
+  eqLowNode.connect(eqMidNode);
+  eqMidNode.connect(eqHighNode);
+  eqHighNode.connect(preFX);
+  eqHighNode.connect(dryGain);
 
-  buildImpulse();
-
-  preFxNode.connect(reverbPreDelay);
-  reverbPreDelay.connect(reverbConvolver);
-  reverbConvolver.connect(reverbDampFilter);
-  reverbDampFilter.connect(reverbWetNode);
-
-  // ─── CHORUS ───
-  buildChorus(preFxNode);
-
-  // ─── CONNECT DRY/WET ───
-  preFxNode.connect(dryGainNode);
-  delayWetNode.connect(wetGainNode);
-  pingWetNode.connect(wetGainNode);
-  reverbWetNode.connect(wetGainNode);
-  chorusWetNode.connect(wetGainNode);
-
-  // ─── MASTER CHAIN ───
-  sourceNode
-    .connect(analyserIn)
-    .connect(inGainNode)
-    .connect(compNode)
-    .connect(compMakeupNode)
-    .connect(eqLow)
-    .connect(eqMid)
-    .connect(eqHigh)
-    .connect(preFxNode);
-
-  dryGainNode.connect(outGainNode);
-  wetGainNode.connect(outGainNode);
-  outGainNode.connect(analyserOut);
-  outGainNode.connect(ctx.destination);
-
-  updateDryWet(parseFloat(document.getElementById('dryWet').value));
+  dryGain.connect(outGain);
+  wetBus.connect(outGain);
+  outGain.connect(analyserOut);
+  outGain.connect(ctx.destination);
 }
 
 function buildChorus(inputNode) {
-  const ctx = audioCtx;
-  const voiceCount = parseInt(document.getElementById('chorVoices').value);
-  const rate = parseFloat(document.getElementById('chorRate').value);
-  const depth = parseFloat(document.getElementById('chorDepth').value) / 1000;
-  const fbVal = parseFloat(document.getElementById('chorFb').value) / 100;
+  const C = ctx;
+  chorDelays=[]; chorLFOs=[]; chorLFOGains=[]; chorPans=[];
+  chorWetGain = C.createGain();
+  chorWetGain.gain.value = bypState.chorus ? v('chorWet')/100 : 0;
+  const voices = 3;
+  const rate = v('chorRate');
+  const depth = v('chorDepth')/1000;
+  const spread = v('chorSpread')/100;
 
-  chorusWetNode = ctx.createGain();
-  chorusWetNode.gain.value = parseFloat(document.getElementById('chorWet').value) / 100;
-
-  chorusDelays = []; chorusLFOs = []; chorusGains = []; chorusFbNodes = [];
-
-  const baseDelay = document.getElementById('modeFlanger').classList.contains('active') ? 0.003 : 0.02;
-
-  for (let i = 0; i < voiceCount; i++) {
-    const delay = ctx.createDelay(0.1);
-    delay.delayTime.value = baseDelay + (i * 0.005);
-
-    const lfo = ctx.createOscillator();
-    lfo.type = 'sine';
-    lfo.frequency.value = rate + (i * 0.1);
-
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = depth;
-
-    const fb = ctx.createGain();
-    fb.gain.value = fbVal;
-
-    const panner = ctx.createStereoPanner();
-    panner.pan.value = voiceCount > 1 ? ((i / (voiceCount - 1)) * 2 - 1) * 0.7 : 0;
-
-    lfo.connect(lfoGain);
-    lfoGain.connect(delay.delayTime);
-    inputNode.connect(delay);
-    delay.connect(fb);
-    fb.connect(delay);
-    delay.connect(panner);
-    panner.connect(chorusWetNode);
+  for(let i=0;i<voices;i++) {
+    const d = C.createDelay(0.1); d.delayTime.value=0.015 + i*0.007;
+    const lfo = C.createOscillator(); lfo.type='sine'; lfo.frequency.value=rate + i*0.13;
+    const lg = C.createGain(); lg.gain.value=depth;
+    const pan = C.createStereoPanner();
+    pan.pan.value = voices>1 ? ((i/(voices-1))*2-1)*spread : 0;
+    lfo.connect(lg); lg.connect(d.delayTime);
+    inputNode.connect(d); d.connect(pan); pan.connect(chorWetGain);
     lfo.start();
-
-    chorusDelays.push(delay);
-    chorusLFOs.push(lfo);
-    chorusGains.push(lfoGain);
-    chorusFbNodes.push(fb);
+    chorDelays.push(d); chorLFOs.push(lfo); chorLFOGains.push(lg); chorPans.push(pan);
   }
+  chorWetGain.connect(wetBus);
 }
 
-function buildImpulse() {
-  const ctx = audioCtx;
-  const size = parseFloat(document.getElementById('revSize').value) / 100;
-  const decay = parseFloat(document.getElementById('revDecay').value);
-  const sampleRate = ctx.sampleRate;
-  const length = Math.floor(sampleRate * decay);
-  const ir = ctx.createBuffer(2, length, sampleRate);
-
-  for (let c = 0; c < 2; c++) {
+function buildIR() {
+  if(!ctx||!convolver) return;
+  const sr = ctx.sampleRate;
+  const decay = v('revDecay');
+  const size = v('revSize')/100;
+  const len = Math.floor(sr * decay);
+  const ir = ctx.createBuffer(2, len, sr);
+  for(let c=0;c<2;c++) {
     const ch = ir.getChannelData(c);
-    for (let i = 0; i < length; i++) {
-      const t = i / sampleRate;
-      // Early reflections + diffuse tail
-      let val = (Math.random() * 2 - 1);
-      if (i < sampleRate * 0.05 * size) val *= 0.5; // early reflections boost
-      val *= Math.exp(-3.0 * t / (decay * 0.5));
-      val *= size;
-      ch[i] = val;
+    for(let i=0;i<len;i++) {
+      const t = i/sr;
+      ch[i] = (Math.random()*2-1) * size * Math.exp(-5*t/decay);
+      // Early reflections shimmer
+      if(i < sr*0.05) ch[i] *= 1.4;
     }
   }
-  reverbConvolver.buffer = ir;
+  convolver.buffer = ir;
 }
 
-function stopProcessor() {
-  running = false;
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-  if (audioCtx) { audioCtx.close(); audioCtx = null; }
-  cancelAnimationFrame(animFrame);
-
-  document.getElementById('statusDot').classList.remove('active');
-  document.getElementById('statusText').textContent = 'OFFLINE — CLICK START';
-  const btn = document.getElementById('btnStart');
-  btn.textContent = '▶ START';
-  btn.classList.remove('running');
-  document.getElementById('latencyVal').textContent = '—';
-
-  clearCanvases();
+function stop() {
+  running=false;
+  if(stream) stream.getTracks().forEach(t=>t.stop()); stream=null;
+  chorLFOs.forEach(l=>{try{l.stop()}catch(e){}});
+  if(ctx){ctx.close();ctx=null;}
+  cancelAnimationFrame(animId);
+  document.getElementById('dot').classList.remove('live');
+  document.getElementById('statusText').textContent='READY';
+  document.getElementById('liveBadge').classList.remove('show');
+  const btn=document.getElementById('btnStart');
+  btn.textContent='▶  START'; btn.classList.remove('live');
+  document.getElementById('latVal').textContent='—';
+  ['vuIn','vuOut'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width='0%'});
+  clearViz();
 }
 
-// ═══════════════════════════════════════════════════════════
-// PARAMETER UPDATES (live while running)
-// ═══════════════════════════════════════════════════════════
-function updateDryWet(val) {
-  const wet = val / 100;
-  const dry = 1 - wet * 0.8;
-  if (dryGainNode) dryGainNode.gain.value = dry;
-}
-
-function onParamChange(id, val) {
-  if (!audioCtx) return;
-  const t = audioCtx.currentTime;
+// ═══════════════════════════════════════════════════════════════════════
+// PARAMETER UPDATES
+// ═══════════════════════════════════════════════════════════════════════
+function onParam(id, val) {
+  if(!ctx) return;
+  const t = ctx.currentTime;
+  const ramp = (node, v, time=0.015) => node.setTargetAtTime(v, t, time);
   switch(id) {
-    case 'inGain': inGainNode.gain.setTargetAtTime(Math.pow(10, val/20), t, 0.01); break;
-    case 'outVol': outGainNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'dryWet': updateDryWet(val); break;
-    case 'compThresh': compNode.threshold.setTargetAtTime(val, t, 0.01); break;
-    case 'compRatio': compNode.ratio.setTargetAtTime(val, t, 0.01); break;
-    case 'compAttack': compNode.attack.setTargetAtTime(val/1000, t, 0.01); break;
-    case 'compRelease': compNode.release.setTargetAtTime(val/1000, t, 0.01); break;
-    case 'compKnee': compNode.knee.setTargetAtTime(val, t, 0.01); break;
-    case 'compMakeup': compMakeupNode.gain.setTargetAtTime(Math.pow(10, val/20), t, 0.01); break;
-    case 'eqLowF': eqLow.frequency.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqLowG': eqLow.gain.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqMidF': eqMid.frequency.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqMidG': eqMid.gain.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqMidQ': eqMid.Q.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqHiF': eqHigh.frequency.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'eqHiG': eqHigh.gain.setTargetAtTime(val, t, 0.01); drawEQ(); break;
-    case 'delayTime': delayNode.delayTime.setTargetAtTime(val/1000, t, 0.01); break;
-    case 'delayFb': delayFbNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'delayDamp': delayDampFilter.frequency.setTargetAtTime(val, t, 0.01); break;
-    case 'delayWet': delayWetNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'pingTime':
-      pingDelayL.delayTime.setTargetAtTime(val/1000, t, 0.01);
-      pingDelayR.delayTime.setTargetAtTime(val/1000*0.75, t, 0.01); break;
-    case 'pingFb': pingFbNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'pingWidth':
-      pingPanL.pan.setTargetAtTime(-val/100, t, 0.01);
-      pingPanR.pan.setTargetAtTime(val/100, t, 0.01); break;
-    case 'pingWet': pingWetNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'revSize': case 'revDecay': buildImpulse(); break;
-    case 'revPre': reverbPreDelay.delayTime.setTargetAtTime(val/1000, t, 0.01); break;
-    case 'revDamp': reverbDampFilter.frequency.setTargetAtTime(val, t, 0.01); break;
-    case 'revWet': reverbWetNode.gain.setTargetAtTime(val/100, t, 0.01); break;
-    case 'chorRate': chorusLFOs.forEach((lfo,i) => lfo.frequency.setTargetAtTime(val + i*0.1, t, 0.01)); break;
-    case 'chorDepth': chorusGains.forEach(g => g.gain.setTargetAtTime(val/1000, t, 0.01)); break;
-    case 'chorFb': chorusFbNodes.forEach(fb => fb.gain.setTargetAtTime(val/100, t, 0.01)); break;
-    case 'chorWet': chorusWetNode.gain.setTargetAtTime(val/100, t, 0.01); break;
+    case 'inGain': ramp(inGain.gain, dbToLin(val)); break;
+    case 'outVol': ramp(outGain.gain, val/100); break;
+    case 'dryWet': dryGain.gain.setTargetAtTime(1-val/100,t,0.02); wetBus.gain.setTargetAtTime(val/100,t,0.02); break;
+    case 'eqLow': if(bypState.eq) ramp(eqLowNode.gain, val); break;
+    case 'eqMid': if(bypState.eq) ramp(eqMidNode.gain, val); break;
+    case 'eqHigh': if(bypState.eq) ramp(eqHighNode.gain, val); break;
+    case 'eqMidF': ramp(eqMidNode.frequency, val); break;
+    case 'echoTime': ramp(echoDelay.delayTime, val/1000); break;
+    case 'echoFb': ramp(echoFb.gain, val/100); break;
+    case 'echoDamp': ramp(echoDampF.frequency, val); break;
+    case 'echoWet': if(bypState.echo) ramp(echoWetGain.gain, val/100); break;
+    case 'pingTime': ramp(pingL.delayTime,val/1000); ramp(pingR.delayTime,val/1000*0.7); break;
+    case 'pingFb': ramp(pingFbGain.gain, val/100); break;
+    case 'pingWidth': ramp(pingPanL.pan,-val/100); ramp(pingPanR.pan,val/100); break;
+    case 'pingWet': if(bypState.ping) ramp(pingWetGain.gain,val/100); break;
+    case 'revSize': case 'revDecay': buildIR(); break;
+    case 'revPre': ramp(revPreDelay.delayTime,val/1000); break;
+    case 'revWet': if(bypState.reverb) ramp(revWetGain.gain,val/100); break;
+    case 'chorRate': chorLFOs.forEach((l,i)=>ramp(l.frequency,val+i*0.13)); break;
+    case 'chorDepth': chorLFOGains.forEach(g=>ramp(g.gain,val/1000)); break;
+    case 'chorSpread': chorPans.forEach((p,i)=>{ const n=chorPans.length; ramp(p.pan,n>1?((i/(n-1))*2-1)*(val/100):0); }); break;
+    case 'chorWet': if(bypState.chorus) ramp(chorWetGain.gain,val/100); break;
+    case 'limThresh': ramp(limiter.threshold,val); break;
+    case 'limRelease': ramp(limiter.release,val/1000); break;
+    case 'limMakeup': ramp(limMakeupGain.gain,dbToLin(val)); break;
   }
+  drawEQ();
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // BYPASS
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function toggleBypass(fx) {
-  if (!audioCtx) return;
-  bypassStates[fx] = !bypassStates[fx];
-  const track = document.getElementById('byp-' + fx);
-  const on = bypassStates[fx];
-  track.classList.toggle('on', on);
-  const label = track.previousElementSibling;
-  label.textContent = on ? 'ON' : 'OFF';
-  const t = audioCtx.currentTime;
+  bypState[fx] = !bypState[fx];
+  const on = bypState[fx];
+  const track = document.getElementById('tog-'+fx);
+  if(track) {
+    track.classList.toggle('on',on);
+    const lbl = track.nextElementSibling;
+    if(lbl) lbl.textContent = on ? 'ON' : 'OFF';
+  }
+  // Update quick buttons
+  const qmap = {echo:'qEcho',reverb:'qReverb',chorus:'qChorus',eq:'qEQ'};
+  if(qmap[fx]) {
+    const qb = document.getElementById(qmap[fx]);
+    if(qb) qb.textContent = (fx.charAt(0).toUpperCase()+fx.slice(1)) + (on?' ON':' OFF');
+  }
+  if(!ctx) return;
+  const t = ctx.currentTime;
   switch(fx) {
-    case 'delay': delayWetNode.gain.setTargetAtTime(on ? parseFloat(document.getElementById('delayWet').value)/100 : 0, t, 0.01); break;
-    case 'ping': pingWetNode.gain.setTargetAtTime(on ? parseFloat(document.getElementById('pingWet').value)/100 : 0, t, 0.01); break;
-    case 'reverb': reverbWetNode.gain.setTargetAtTime(on ? parseFloat(document.getElementById('revWet').value)/100 : 0, t, 0.01); break;
-    case 'chorus': chorusWetNode.gain.setTargetAtTime(on ? parseFloat(document.getElementById('chorWet').value)/100 : 0, t, 0.01); break;
-    case 'comp':
-      compNode.threshold.setTargetAtTime(on ? parseFloat(document.getElementById('compThresh').value) : 0, t, 0.01);
-      compNode.ratio.setTargetAtTime(on ? parseFloat(document.getElementById('compRatio').value) : 1, t, 0.01); break;
+    case 'echo': echoWetGain.gain.setTargetAtTime(on?v('echoWet')/100:0,t,0.02); break;
+    case 'ping': pingWetGain.gain.setTargetAtTime(on?v('pingWet')/100:0,t,0.02); break;
+    case 'reverb': revWetGain.gain.setTargetAtTime(on?v('revWet')/100:0,t,0.02); break;
+    case 'chorus': chorWetGain.gain.setTargetAtTime(on?v('chorWet')/100:0,t,0.02); break;
     case 'eq':
-      eqLow.gain.setTargetAtTime(on ? parseFloat(document.getElementById('eqLowG').value) : 0, t, 0.01);
-      eqMid.gain.setTargetAtTime(on ? parseFloat(document.getElementById('eqMidG').value) : 0, t, 0.01);
-      eqHigh.gain.setTargetAtTime(on ? parseFloat(document.getElementById('eqHiG').value) : 0, t, 0.01); break;
+      eqLowNode.gain.setTargetAtTime(on?v('eqLow'):0,t,0.02);
+      eqMidNode.gain.setTargetAtTime(on?v('eqMid'):0,t,0.02);
+      eqHighNode.gain.setTargetAtTime(on?v('eqHigh'):0,t,0.02); break;
+    case 'limiter':
+      limiter.threshold.setTargetAtTime(on?v('limThresh'):0,t,0.02);
+      limiter.ratio.setTargetAtTime(on?20:1,t,0.02); break;
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// CHORUS MODE
-// ═══════════════════════════════════════════════════════════
-function setChorusMode(mode) {
-  document.getElementById('modeChorus').classList.toggle('active', mode === 'chorus');
-  document.getElementById('modeFlanger').classList.toggle('active', mode === 'flanger');
-  if (mode === 'flanger') {
-    document.getElementById('chorRate').value = 0.5;
-    document.getElementById('chorDepth').value = 3;
-    document.getElementById('chorFb').value = 70;
-    updateSliderDisplays();
-  }
-  if (audioCtx) {
-    const base = mode === 'flanger' ? 0.003 : 0.02;
-    chorusDelays.forEach((d,i) => {
-      const v = base + i * 0.005;
-      d.delayTime.setTargetAtTime(v, audioCtx.currentTime, 0.01);
-    });
-    const fbVal = parseFloat(document.getElementById('chorFb').value) / 100;
-    chorusFbNodes.forEach(fb => fb.gain.setTargetAtTime(fbVal, audioCtx.currentTime, 0.01));
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// REVERB TYPES
-// ═══════════════════════════════════════════════════════════
-function setReverbType(type) {
-  const presets = {
-    room: {size:30, decay:0.8, pre:10, damp:5000},
-    hall: {size:75, decay:3.5, pre:30, damp:8000},
-    plate: {size:50, decay:2.0, pre:5, damp:12000},
-    church: {size:90, decay:6.0, pre:60, damp:6000}
+// ═══════════════════════════════════════════════════════════════════════
+// REVERB TYPE
+// ═══════════════════════════════════════════════════════════════════════
+function setRevType(type, btn) {
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const types = {
+    room:{size:40,decay:0.9,pre:10},
+    hall:{size:75,decay:3.5,pre:25},
+    plate:{size:55,decay:2.0,pre:5},
+    mosque:{size:95,decay:6.5,pre:50}
   };
-  const p = presets[type];
-  document.getElementById('revSize').value = p.size;
-  document.getElementById('revDecay').value = p.decay;
-  document.getElementById('revPre').value = p.pre;
-  document.getElementById('revDamp').value = p.damp;
-  updateSliderDisplays();
-  if (audioCtx) {
-    buildImpulse();
-    onParamChange('revPre', p.pre);
-    onParamChange('revDamp', p.damp);
-  }
+  const p = types[type];
+  setVal('revSize',p.size); setVal('revDecay',p.decay); setVal('revPre',p.pre);
+  updateDisplays(); buildIR();
+  onParam('revPre',p.pre);
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // TAP TEMPO
-// ═══════════════════════════════════════════════════════════
-function tapTempo(which) {
+// ═══════════════════════════════════════════════════════════════════════
+const taps = {echo:[],ping:[]};
+function doTap(which) {
   const now = performance.now();
-  tapTimes[which].push(now);
-  if (tapTimes[which].length > 4) tapTimes[which].shift();
-  if (tapTimes[which].length < 2) return;
-  const diffs = [];
-  for (let i = 1; i < tapTimes[which].length; i++) diffs.push(tapTimes[which][i] - tapTimes[which][i-1]);
-  const avg = diffs.reduce((a,b)=>a+b,0) / diffs.length;
-  const bpm = Math.round(60000 / avg);
-  const ms = Math.round(avg);
-  if (which === 'delay') {
-    document.getElementById('tapBPM').textContent = bpm + ' BPM';
-    document.getElementById('delayTime').value = Math.min(ms, 1000);
-    updateSliderDisplays();
-    onParamChange('delayTime', Math.min(ms, 1000));
-  } else {
-    document.getElementById('tapBPM2').textContent = bpm + ' BPM';
-    document.getElementById('pingTime').value = Math.min(ms, 800);
-    updateSliderDisplays();
-    onParamChange('pingTime', Math.min(ms, 800));
-  }
+  taps[which].push(now);
+  if(taps[which].length>4) taps[which].shift();
+  if(taps[which].length<2) return;
+  const diffs=[];
+  for(let i=1;i<taps[which].length;i++) diffs.push(taps[which][i]-taps[which][i-1]);
+  const avg = diffs.reduce((a,b)=>a+b,0)/diffs.length;
+  const bpm = Math.round(60000/avg);
+  const ms = Math.min(Math.round(avg), which==='echo'?900:800);
+  const tapEl = document.getElementById(which==='echo'?'tapEcho':'tapPing');
+  if(tapEl) tapEl.textContent = bpm+' BPM';
+  const slId = which==='echo'?'echoTime':'pingTime';
+  setVal(slId, ms); updateDisplays(); onParam(slId, ms);
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // PRESETS
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 const presets = {
-  clean: {inGain:0,outVol:80,dryWet:0,compThresh:-20,compRatio:4,compAttack:10,compRelease:100,compKnee:10,compMakeup:0,eqLowF:100,eqLowG:0,eqMidF:1000,eqMidG:0,eqMidQ:1,eqHiF:8000,eqHiG:0,delayTime:250,delayFb:0,delayDamp:20000,delayWet:0,pingTime:300,pingFb:0,pingWidth:100,pingWet:0,revSize:10,revDecay:0.5,revPre:5,revDamp:8000,revWet:0,chorRate:1,chorDepth:5,chorVoices:3,chorFb:0,chorWet:0},
-  studio: {inGain:0,outVol:85,dryWet:35,compThresh:-24,compRatio:3,compAttack:5,compRelease:80,compKnee:8,compMakeup:3,eqLowF:120,eqLowG:-2,eqMidF:3000,eqMidG:2,eqMidQ:0.8,eqHiF:10000,eqHiG:3,delayTime:350,delayFb:30,delayDamp:6000,delayWet:20,pingTime:0,pingFb:0,pingWidth:100,pingWet:0,revSize:40,revDecay:1.5,revPre:20,revDamp:7000,revWet:25,chorRate:0.8,chorDepth:8,chorVoices:3,chorFb:0,chorWet:20},
-  stadium: {inGain:0,outVol:80,dryWet:60,compThresh:-18,compRatio:5,compAttack:8,compRelease:200,compKnee:12,compMakeup:4,eqLowF:80,eqLowG:1,eqMidF:2000,eqMidG:-1,eqMidQ:1,eqHiF:12000,eqHiG:2,delayTime:400,delayFb:55,delayDamp:8000,delayWet:40,pingTime:600,pingFb:50,pingWidth:100,pingWet:35,revSize:85,revDecay:4.5,revPre:40,revDamp:8000,revWet:50,chorRate:0.5,chorDepth:4,chorVoices:2,chorFb:0,chorWet:10},
-  dreamy: {inGain:0,outVol:75,dryWet:70,compThresh:-22,compRatio:3,compAttack:15,compRelease:150,compKnee:15,compMakeup:2,eqLowF:100,eqLowG:2,eqMidF:800,eqMidG:1,eqMidQ:0.5,eqHiF:6000,eqHiG:-2,delayTime:500,delayFb:60,delayDamp:5000,delayWet:45,pingTime:700,pingFb:55,pingWidth:100,pingWet:40,revSize:90,revDecay:5.0,revPre:50,revDamp:5000,revWet:55,chorRate:0.5,chorDepth:15,chorVoices:4,chorFb:10,chorWet:40},
-  vintage: {inGain:0,outVol:80,dryWet:40,compThresh:-16,compRatio:8,compAttack:20,compRelease:300,compKnee:5,compMakeup:5,eqLowF:150,eqLowG:3,eqMidF:2500,eqMidG:4,eqMidQ:1.2,eqHiF:8000,eqHiG:-5,delayTime:320,delayFb:45,delayDamp:3000,delayWet:30,pingTime:0,pingFb:0,pingWidth:70,pingWet:0,revSize:35,revDecay:1.2,revPre:15,revDamp:4000,revWet:25,chorRate:3.5,chorDepth:6,chorVoices:2,chorFb:15,chorWet:25},
-  telephone: {inGain:5,outVol:85,dryWet:5,compThresh:-10,compRatio:15,compAttack:2,compRelease:50,compKnee:3,compMakeup:8,eqLowF:400,eqLowG:-18,eqMidF:1800,eqMidG:8,eqMidQ:3,eqHiF:4000,eqHiG:-18,delayTime:80,delayFb:15,delayDamp:3000,delayWet:10,pingTime:0,pingFb:0,pingWidth:50,pingWet:0,revSize:5,revDecay:0.3,revPre:2,revDamp:3000,revWet:5,chorRate:8,chorDepth:2,chorVoices:2,chorFb:0,chorWet:10},
-  cave: {inGain:0,outVol:75,dryWet:65,compThresh:-28,compRatio:4,compAttack:30,compRelease:500,compKnee:20,compMakeup:3,eqLowF:60,eqLowG:5,eqMidF:500,eqMidG:-3,eqMidQ:0.7,eqHiF:5000,eqHiG:-8,delayTime:450,delayFb:65,delayDamp:4000,delayWet:50,pingTime:800,pingFb:60,pingWidth:100,pingWet:45,revSize:95,revDecay:7.0,revPre:80,revDamp:4000,revWet:65,chorRate:0.2,chorDepth:20,chorVoices:3,chorFb:5,chorWet:15}
+  naat:{inGain:0,outVol:85,dryWet:45,eqLow:2,eqMid:3,eqHigh:3,eqMidF:2500,echoTime:340,echoFb:55,echoDamp:8000,echoWet:48,pingTime:510,pingFb:40,pingWidth:100,pingWet:20,revSize:50,revDecay:2.2,revPre:15,revWet:28,chorRate:0.8,chorDepth:8,chorSpread:80,chorWet:18,limThresh:-6,limRelease:80,limMakeup:2},
+  grand:{inGain:0,outVol:80,dryWet:60,eqLow:0,eqMid:2,eqHigh:4,eqMidF:3000,echoTime:420,echoFb:60,echoDamp:7000,echoWet:40,pingTime:630,pingFb:50,pingWidth:100,pingWet:30,revSize:85,revDecay:4.5,revPre:30,revWet:45,chorRate:0.5,chorDepth:6,chorSpread:90,chorWet:15,limThresh:-4,limRelease:100,limMakeup:1},
+  studio:{inGain:2,outVol:82,dryWet:30,eqLow:-1,eqMid:3,eqHigh:5,eqMidF:3500,echoTime:280,echoFb:35,echoDamp:10000,echoWet:22,pingTime:400,pingFb:28,pingWidth:80,pingWet:15,revSize:35,revDecay:1.2,revPre:12,revWet:20,chorRate:1.2,chorDepth:5,chorSpread:70,chorWet:12,limThresh:-4,limRelease:60,limMakeup:2},
+  intimate:{inGain:0,outVol:80,dryWet:25,eqLow:3,eqMid:2,eqHigh:1,eqMidF:2000,echoTime:180,echoFb:30,echoDamp:6000,echoWet:18,pingTime:250,pingFb:20,pingWidth:60,pingWet:10,revSize:25,revDecay:0.8,revPre:8,revWet:18,chorRate:0.6,chorDepth:10,chorSpread:60,chorWet:15,limThresh:-5,limRelease:70,limMakeup:1},
+  mosque:{inGain:0,outVol:78,dryWet:70,eqLow:1,eqMid:1,eqHigh:2,eqMidF:2000,echoTime:500,echoFb:65,echoDamp:6000,echoWet:55,pingTime:750,pingFb:58,pingWidth:100,pingWet:40,revSize:98,revDecay:7.0,revPre:60,revWet:60,chorRate:0.3,chorDepth:12,chorSpread:100,chorWet:10,limThresh:-4,limRelease:150,limMakeup:0},
+  dry:{inGain:0,outVol:85,dryWet:0,eqLow:0,eqMid:0,eqHigh:0,eqMidF:2500,echoTime:340,echoFb:55,echoDamp:8000,echoWet:0,pingTime:480,pingFb:45,pingWidth:100,pingWet:0,revSize:60,revDecay:2.5,revPre:15,revWet:0,chorRate:0.8,chorDepth:8,chorSpread:80,chorWet:0,limThresh:-6,limRelease:80,limMakeup:0}
 };
 
-function applyPreset(name) {
+function applyPreset(name, el) {
+  document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
   const p = presets[name];
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  Object.keys(p).forEach(k => {
-    const el = document.getElementById(k);
-    if (el) { el.value = p[k]; onParamChange(k, p[k]); }
-  });
-  updateSliderDisplays();
-  if (audioCtx) buildImpulse();
+  Object.keys(p).forEach(k=>{setVal(k,p[k]); onParam(k,p[k]);});
+  updateDisplays(); buildIR();
 }
 
-// ═══════════════════════════════════════════════════════════
-// SLIDER DISPLAY UPDATES
-// ═══════════════════════════════════════════════════════════
-const sliderDisplays = {
-  inGain: v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(1) + ' dB',
-  outVol: v => v + '%',
-  dryWet: v => v + '%',
-  compThresh: v => v + ' dB',
-  compRatio: v => parseFloat(v).toFixed(1) + ':1',
-  compAttack: v => v + ' ms',
-  compRelease: v => v + ' ms',
-  compKnee: v => v + ' dB',
-  compMakeup: v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(1) + ' dB',
-  eqLowF: v => v >= 1000 ? (v/1000).toFixed(1)+'kHz' : v+' Hz',
-  eqLowG: v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(1) + ' dB',
-  eqMidF: v => v >= 1000 ? (v/1000).toFixed(1)+'kHz' : v+' Hz',
-  eqMidG: v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(1) + ' dB',
-  eqMidQ: v => parseFloat(v).toFixed(1),
-  eqHiF: v => v >= 1000 ? (v/1000).toFixed(1)+'kHz' : v+' Hz',
-  eqHiG: v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(1) + ' dB',
-  delayTime: v => v + ' ms',
-  delayFb: v => v + '%',
-  delayDamp: v => v >= 1000 ? (v/1000).toFixed(1)+'kHz' : v+' Hz',
-  delayWet: v => v + '%',
-  pingTime: v => v + ' ms',
-  pingFb: v => v + '%',
-  pingWidth: v => v + '%',
-  pingWet: v => v + '%',
-  revSize: v => v + '%',
-  revDecay: v => parseFloat(v).toFixed(1) + ' s',
-  revPre: v => v + ' ms',
-  revDamp: v => v >= 1000 ? (v/1000).toFixed(1)+'kHz' : v+' Hz',
-  revWet: v => v + '%',
-  chorRate: v => parseFloat(v).toFixed(1) + ' Hz',
-  chorDepth: v => parseFloat(v).toFixed(1) + ' ms',
-  chorVoices: v => v,
-  chorFb: v => v + '%',
-  chorWet: v => v + '%'
+// ═══════════════════════════════════════════════════════════════════════
+// SLIDER DISPLAY SYSTEM
+// ═══════════════════════════════════════════════════════════════════════
+const fmt = {
+  inGain: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
+  outVol: n=>n+'%',
+  dryWet: n=>n+'%',
+  eqLow: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
+  eqMid: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
+  eqHigh: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB',
+  eqMidF: n=>n>=1000?(n/1000).toFixed(1)+' kHz':n+' Hz',
+  echoTime: n=>n+' ms',
+  echoFb: n=>n+'%',
+  echoDamp: n=>n>=1000?(n/1000).toFixed(0)+' kHz':n+' Hz',
+  echoWet: n=>n+'%',
+  pingTime: n=>n+' ms',
+  pingFb: n=>n+'%',
+  pingWidth: n=>n+'%',
+  pingWet: n=>n+'%',
+  revSize: n=>n+'%',
+  revDecay: n=>parseFloat(n).toFixed(1)+' s',
+  revPre: n=>n+' ms',
+  revWet: n=>n+'%',
+  chorRate: n=>parseFloat(n).toFixed(1)+' Hz',
+  chorDepth: n=>parseFloat(n).toFixed(0)+' ms',
+  chorSpread: n=>n+'%',
+  chorWet: n=>n+'%',
+  limThresh: n=>parseFloat(n).toFixed(1)+' dB',
+  limRelease: n=>n+' ms',
+  limMakeup: n=>(n>=0?'+':'')+parseFloat(n).toFixed(1)+' dB'
 };
 
-function updateSliderDisplays() {
-  Object.keys(sliderDisplays).forEach(id => {
-    const el = document.getElementById(id);
-    const out = document.getElementById(id + 'Val');
-    if (el && out) out.textContent = sliderDisplays[id](el.value);
-  });
-  drawEQ();
+function sliderUpdate(el, id) {
+  const val = parseFloat(el.value);
+  // Update gradient fill
+  const min=parseFloat(el.min), max=parseFloat(el.max);
+  const pct = Math.round((val-min)/(max-min)*100);
+  el.style.setProperty('--pct', pct+'%');
+  // Update value display
+  const disp = document.getElementById('v'+id.charAt(0).toUpperCase()+id.slice(1));
+  if(disp && fmt[id]) disp.textContent = fmt[id](val);
+  onParam(id, val);
+  if(id.startsWith('eq')) drawEQ();
 }
 
-// Wire sliders
-document.addEventListener('DOMContentLoaded', () => {
-  Object.keys(sliderDisplays).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', () => {
-      const out = document.getElementById(id + 'Val');
-      if (out) out.textContent = sliderDisplays[id](el.value);
-      onParamChange(id, parseFloat(el.value));
-      if (id.startsWith('eq')) drawEQ();
-    });
-  });
-  updateSliderDisplays();
-  drawEQ();
-  resizeCanvases();
-  window.addEventListener('resize', resizeCanvases);
-});
-
-// ═══════════════════════════════════════════════════════════
-// EQ CURVE DRAWING
-// ═══════════════════════════════════════════════════════════
-function drawEQ() {
-  const canvas = document.getElementById('eqCurve');
-  if (!canvas) return;
-  const ctx2 = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx2.clearRect(0, 0, W, H);
-
-  const lowF = parseFloat(document.getElementById('eqLowF').value);
-  const lowG = parseFloat(document.getElementById('eqLowG').value);
-  const midF = parseFloat(document.getElementById('eqMidF').value);
-  const midG = parseFloat(document.getElementById('eqMidG').value);
-  const midQ = parseFloat(document.getElementById('eqMidQ').value);
-  const hiF = parseFloat(document.getElementById('eqHiF').value);
-  const hiG = parseFloat(document.getElementById('eqHiG').value);
-
-  const freqs = [];
-  for (let i = 0; i < W; i++) freqs.push(20 * Math.pow(1000, i / W));
-
-  function magAt(f) {
-    // Low shelf approx
-    let db = 0;
-    db += lowG * Math.max(0, 1 - Math.abs(Math.log2(f/lowF)));
-    if (f < lowF) db = lowG * (1 - Math.max(0, (f - 20) / (lowF - 20) * 0));
-    db += lowG * Math.exp(-Math.pow(Math.log10(f/lowF), 2) * 2);
-    // Actually use simple shelf formula
-    const lowShelf = lowG / (1 + Math.pow(f/lowF, 2));
-    const highShelf = hiG / (1 + Math.pow(hiF/f, 2));
-    const peak = midG / (1 + Math.pow(midQ * (f/midF - midF/f), 2));
-    return lowShelf + highShelf + peak;
-  }
-
-  ctx2.strokeStyle = '#4da6ff';
-  ctx2.lineWidth = 1.5;
-  ctx2.shadowColor = '#4da6ff';
-  ctx2.shadowBlur = 4;
-  ctx2.beginPath();
-  freqs.forEach((f, i) => {
-    const db = magAt(f);
-    const y = H/2 - (db / 18) * (H/2 - 4);
-    if (i === 0) ctx2.moveTo(i, y);
-    else ctx2.lineTo(i, y);
-  });
-  ctx2.stroke();
-
-  // Grid line at 0
-  ctx2.shadowBlur = 0;
-  ctx2.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx2.lineWidth = 0.5;
-  ctx2.beginPath();
-  ctx2.moveTo(0, H/2);
-  ctx2.lineTo(W, H/2);
-  ctx2.stroke();
-}
-
-// ═══════════════════════════════════════════════════════════
-// VISUALIZATION
-// ═══════════════════════════════════════════════════════════
-function resizeCanvases() {
-  ['vuIn','vuOut','vizCanvas','eqCurve'].forEach(id => {
-    const c = document.getElementById(id);
-    if (c) c.width = c.offsetWidth;
-  });
-  drawEQ();
-}
-
-function clearCanvases() {
-  ['vuIn','vuOut','vizCanvas'].forEach(id => {
-    const c = document.getElementById(id);
-    if (!c) return;
-    const ctx2 = c.getContext('2d');
-    ctx2.clearRect(0, 0, c.width, c.height);
-  });
-}
-
-function startVisualization() {
-  const inData = new Uint8Array(analyserIn.frequencyBinCount);
-  const outData = new Uint8Array(analyserOut.frequencyBinCount);
-  const waveData = new Uint8Array(analyserOut.fftSize);
-
-  function draw() {
-    if (!running) return;
-    animFrame = requestAnimationFrame(draw);
-
-    analyserIn.getByteFrequencyData(inData);
-    analyserOut.getByteFrequencyData(outData);
-
-    // VU meters
-    drawVU('vuIn', inData, '#00e5b4');
-    drawVU('vuOut', outData, '#22ee88');
-
-    // Waveform or spectrum
-    const mode = document.getElementById('vizMode').value;
-    if (mode === 'waveform') {
-      analyserOut.getByteTimeDomainData(waveData);
-      drawWaveform(waveData);
-    } else {
-      drawSpectrum(outData);
+function updateDisplays() {
+  Object.keys(fmt).forEach(id=>{
+    const el=document.getElementById(id);
+    const disp=document.getElementById('v'+id.charAt(0).toUpperCase()+id.slice(1));
+    if(el&&disp) {
+      disp.textContent=fmt[id](parseFloat(el.value));
+      const min=parseFloat(el.min),max=parseFloat(el.max),val=parseFloat(el.value);
+      el.style.setProperty('--pct',Math.round((val-min)/(max-min)*100)+'%');
     }
-  }
-  draw();
+  });
 }
 
-function drawVU(id, data, color) {
-  const canvas = document.getElementById(id);
-  if (!canvas) return;
-  const ctx2 = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx2.clearRect(0, 0, W, H);
-
-  const avg = data.slice(0, 50).reduce((a, b) => a + b, 0) / 50;
-  const level = avg / 255;
-
-  const grad = ctx2.createLinearGradient(0, 0, W * level, 0);
-  grad.addColorStop(0, color);
-  grad.addColorStop(0.7, color);
-  grad.addColorStop(1, '#ff4466');
-
-  ctx2.fillStyle = '#1e1e30';
-  ctx2.fillRect(0, 0, W, H);
-  ctx2.fillStyle = grad;
-  ctx2.fillRect(0, 0, W * level, H);
+function setVal(id, val) {
+  const el=document.getElementById(id);
+  if(el) el.value=val;
 }
 
-function drawWaveform(data) {
-  const canvas = document.getElementById('vizCanvas');
-  if (!canvas) return;
-  const ctx2 = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx2.fillStyle = '#0f0f1a';
-  ctx2.fillRect(0, 0, W, H);
+// ═══════════════════════════════════════════════════════════════════════
+// EQ CURVE
+// ═══════════════════════════════════════════════════════════════════════
+function drawEQ() {
+  const c=document.getElementById('eqCanvas'); if(!c) return;
+  const g=c.getContext('2d'), W=c.width, H=c.height;
+  g.clearRect(0,0,W,H);
+  g.fillStyle='#181410'; g.fillRect(0,0,W,H);
 
   // Grid
-  ctx2.strokeStyle = 'rgba(255,255,255,0.04)';
-  ctx2.lineWidth = 0.5;
-  for (let i = 0; i < 8; i++) {
-    const x = (i / 8) * W;
-    ctx2.beginPath(); ctx2.moveTo(x, 0); ctx2.lineTo(x, H); ctx2.stroke();
-  }
-  ctx2.beginPath(); ctx2.moveTo(0, H/2); ctx2.lineTo(W, H/2); ctx2.stroke();
+  g.strokeStyle='rgba(255,255,255,0.06)'; g.lineWidth=0.5;
+  g.beginPath(); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
 
-  ctx2.strokeStyle = '#00e5b4';
-  ctx2.lineWidth = 1.5;
-  ctx2.shadowColor = '#00e5b4';
-  ctx2.shadowBlur = 4;
-  ctx2.beginPath();
-  const step = W / data.length;
-  for (let i = 0; i < data.length; i++) {
-    const y = ((data[i] / 128) - 1) * (H / 2) + H / 2;
-    if (i === 0) ctx2.moveTo(0, y);
-    else ctx2.lineTo(i * step, y);
+  const lowG=parseFloat(document.getElementById('eqLow').value);
+  const midG=parseFloat(document.getElementById('eqMid').value);
+  const hiG=parseFloat(document.getElementById('eqHigh').value);
+  const midF=parseFloat(document.getElementById('eqMidF').value);
+
+  g.strokeStyle='#ff9f43'; g.lineWidth=2; g.shadowColor='#ff9f43'; g.shadowBlur=6;
+  g.beginPath();
+  for(let i=0;i<W;i++) {
+    const f=20*Math.pow(1000,i/W);
+    const low=lowG/(1+Math.pow(f/200,2));
+    const mid=midG/(1+Math.pow(1.2*(f/midF-midF/f),2));
+    const hi=hiG/(1+Math.pow(8000/f,2));
+    const db=low+mid+hi;
+    const y=H/2-(db/18)*(H/2-4);
+    i===0?g.moveTo(i,y):g.lineTo(i,y);
   }
-  ctx2.stroke();
+  g.stroke();
 }
 
-function drawSpectrum(data) {
-  const canvas = document.getElementById('vizCanvas');
-  if (!canvas) return;
-  const ctx2 = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx2.fillStyle = '#0f0f1a';
-  ctx2.fillRect(0, 0, W, H);
+// ═══════════════════════════════════════════════════════════════════════
+// VISUALIZATION
+// ═══════════════════════════════════════════════════════════════════════
+function startViz() {
+  const inBuf=new Uint8Array(analyserIn.frequencyBinCount);
+  const outBuf=new Uint8Array(analyserOut.frequencyBinCount);
+  const waveBuf=new Uint8Array(analyserOut.fftSize);
 
-  const bars = 80;
-  const barW = W / bars - 1;
-  for (let i = 0; i < bars; i++) {
-    const idx = Math.floor((i / bars) * data.length);
-    const val = data[idx] / 255;
-    const h = val * H;
-    const hue = 160 + i * 2;
-    ctx2.fillStyle = `hsl(${hue}, 80%, ${40 + val * 30}%)`;
-    ctx2.fillRect(i * (barW + 1), H - h, barW, h);
+  function frame() {
+    if(!running) return;
+    animId=requestAnimationFrame(frame);
+
+    analyserIn.getByteFrequencyData(inBuf);
+    analyserOut.getByteFrequencyData(outBuf);
+
+    // VU bars
+    const inLvl=inBuf.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;
+    const outLvl=outBuf.slice(0,60).reduce((a,b)=>a+b,0)/(60*255)*100;
+    document.getElementById('vuIn').style.width=Math.min(inLvl*2,100)+'%';
+    document.getElementById('vuOut').style.width=Math.min(outLvl*2,100)+'%';
+
+    // Gain reduction
+    if(limiter) {
+      const gr=Math.abs(limiter.reduction||0);
+      document.getElementById('grBar').style.width=Math.min(gr*5,100)+'%';
+    }
+
+    // Canvas viz
+    const mode=document.getElementById('vizMode').value;
+    const vc=document.getElementById('vizCanvas');
+    if(!vc) return;
+    const g=vc.getContext('2d'), W=vc.width, H=vc.height;
+
+    if(mode==='wave') {
+      analyserOut.getByteTimeDomainData(waveBuf);
+      g.fillStyle='#0f0d09'; g.fillRect(0,0,W,H);
+      // Grid lines
+      g.strokeStyle='rgba(201,149,42,0.08)'; g.lineWidth=0.5;
+      for(let i=1;i<4;i++){g.beginPath();g.moveTo(0,H*i/4);g.lineTo(W,H*i/4);g.stroke();}
+      g.strokeStyle='#c9952a'; g.lineWidth=1.5; g.shadowColor='rgba(201,149,42,0.5)'; g.shadowBlur=6;
+      g.beginPath();
+      const step=W/waveBuf.length;
+      for(let i=0;i<waveBuf.length;i++){
+        const y=((waveBuf[i]/128)-1)*(H/2)+H/2;
+        i===0?g.moveTo(0,y):g.lineTo(i*step,y);
+      }
+      g.stroke();
+    } else {
+      g.fillStyle='#0f0d09'; g.fillRect(0,0,W,H);
+      const bars=64, bw=W/bars-1;
+      for(let i=0;i<bars;i++){
+        const idx=Math.floor((i/bars)*outBuf.length);
+        const val=outBuf[idx]/255;
+        const h=val*H;
+        const r=150+i*1.5, gb=80+val*80;
+        g.fillStyle=`rgb(${Math.round(r)},${Math.round(gb)},30)`;
+        g.fillRect(i*(bw+1),H-h,bw,h);
+      }
+    }
   }
+  frame();
 }
+
+function clearViz() {
+  const vc=document.getElementById('vizCanvas');
+  if(vc){const g=vc.getContext('2d');g.fillStyle='#0f0d09';g.fillRect(0,0,vc.width,vc.height);}
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+const dbToLin=db=>Math.pow(10,db/20);
+const v=id=>parseFloat(document.getElementById(id).value);
+
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', ()=>{
+  updateDisplays();
+  drawEQ();
+
+  // Resize canvases on load and resize
+  const resize=()=>{
+    ['vizCanvas','eqCanvas'].forEach(id=>{
+      const c=document.getElementById(id);
+      if(c) c.width=c.offsetWidth;
+    });
+    drawEQ();
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Apply Naat preset by default
+  applyPreset('naat', document.querySelector('.preset-card'));
+});
 </script>
 </body>
 </html>
